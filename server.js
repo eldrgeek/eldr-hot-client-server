@@ -21,7 +21,18 @@ app.use(webpackHotMiddleware(compiler));
 app.use(function(req, res, next) {
   require('./server/app')(req, res, next);
 });
+let consoleContents = []
 
+
+
+
+app.get("/console/:op", function (request, response) {
+  console.log(request.params.op)
+  if(request.params.op==='clear'){
+    consoleContents = []
+  }
+  response.send(consoleContents); 
+});
 // Anything else gets passed to the client app's server rendering
 app.get('*', function(req, res, next) {
   require('./client/server-render')(req.path, function(err, page) {
@@ -61,3 +72,21 @@ server.listen(3000, 'localhost', function(err) {
 
   console.log('Listening at http://%s:%d', addr.address, addr.port);
 });
+let tickNo = 0
+let bindConsole = () => {
+  let oldLog = console.log.bind(console)
+  oldLog('this')
+
+  let newLog = (...args) => {
+    oldLog(...args);
+    oldLog("from newlog")
+    if (consoleContents.length < 10)
+      consoleContents.push(JSON.stringify(args))
+    //oldLog(consoleContents)
+  }
+
+  newLog('thihs','and that') 
+  console.log = newLog
+}
+bindConsole()
+console.log("After bind");  

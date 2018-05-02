@@ -854,7 +854,7 @@
       "basename": "server"
     },
     "ignored": false,
-    "code": "'use strict';\n\nvar _keys = require('babel-runtime/core-js/object/keys');\n\nvar _keys2 = _interopRequireDefault(_keys);\n\nvar _chokidar = require('chokidar');\n\nvar _chokidar2 = _interopRequireDefault(_chokidar);\n\nvar _webpack = require('./webpack.config');\n\nvar _webpack2 = _interopRequireDefault(_webpack);\n\nvar _cssModulesRequireHook = require('css-modules-require-hook');\n\nvar _cssModulesRequireHook2 = _interopRequireDefault(_cssModulesRequireHook);\n\nvar _express = require('express');\n\nvar _express2 = _interopRequireDefault(_express);\n\nvar _http = require('http');\n\nvar _http2 = _interopRequireDefault(_http);\n\nvar _webpack3 = require('webpack');\n\nvar _webpack4 = _interopRequireDefault(_webpack3);\n\nvar _webpackDevMiddleware = require('webpack-dev-middleware');\n\nvar _webpackDevMiddleware2 = _interopRequireDefault(_webpackDevMiddleware);\n\nvar _webpackHotMiddleware = require('webpack-hot-middleware');\n\nvar _webpackHotMiddleware2 = _interopRequireDefault(_webpackHotMiddleware);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n(0, _cssModulesRequireHook2.default)({ generateScopedName: '[path][name]-[local]' });\nvar compiler = (0, _webpack4.default)(_webpack2.default);\nvar app = (0, _express2.default)();\n\n// Serve hot-reloading bundle to client\napp.use((0, _webpackDevMiddleware2.default)(compiler, {\n  noInfo: true, publicPath: _webpack2.default.output.publicPath\n}));\napp.use((0, _webpackHotMiddleware2.default)(compiler));\n\n// Include server routes as a middleware\napp.use(function (req, res, next) {\n  require('./server/app')(req, res, next);\n});\n\n// Anything else gets passed to the client app's server rendering\napp.get('*', function (req, res, next) {\n  require('./client/server-render')(req.path, function (err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nvar watcher = _chokidar2.default.watch('./server');\n\nwatcher.on('ready', function () {\n  watcher.on('all', function () {\n    console.log(\"Clearing /server/ module cache from server\");\n    (0, _keys2.default)(require.cache).forEach(function (id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function () {\n  console.log(\"Clearing /client/ module cache from server\");\n  (0, _keys2.default)(require.cache).forEach(function (id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nvar server = _http2.default.createServer(app);\nserver.listen(3000, 'localhost', function (err) {\n  if (err) throw err;\n\n  var addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNlcnZlci5qcyJdLCJuYW1lcyI6WyJnZW5lcmF0ZVNjb3BlZE5hbWUiLCJjb21waWxlciIsImFwcCIsInVzZSIsIm5vSW5mbyIsInB1YmxpY1BhdGgiLCJvdXRwdXQiLCJyZXEiLCJyZXMiLCJuZXh0IiwicmVxdWlyZSIsImdldCIsInBhdGgiLCJlcnIiLCJwYWdlIiwic2VuZCIsIndhdGNoZXIiLCJ3YXRjaCIsIm9uIiwiY29uc29sZSIsImxvZyIsImNhY2hlIiwiZm9yRWFjaCIsImlkIiwidGVzdCIsInBsdWdpbiIsInNlcnZlciIsImNyZWF0ZVNlcnZlciIsImxpc3RlbiIsImFkZHIiLCJhZGRyZXNzIiwicG9ydCJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUE7Ozs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7Ozs7O0FBRUEscUNBQXNCLEVBQUNBLG9CQUFvQixzQkFBckIsRUFBdEI7QUFDQSxJQUFNQyxXQUFXLHlDQUFqQjtBQUNBLElBQU1DLE1BQU0sd0JBQVo7O0FBRUE7QUFDQUEsSUFBSUMsR0FBSixDQUFRLG9DQUFxQkYsUUFBckIsRUFBK0I7QUFDckNHLFVBQVEsSUFENkIsRUFDdkJDLFlBQVksa0JBQU9DLE1BQVAsQ0FBY0Q7QUFESCxDQUEvQixDQUFSO0FBR0FILElBQUlDLEdBQUosQ0FBUSxvQ0FBcUJGLFFBQXJCLENBQVI7O0FBRUE7QUFDQUMsSUFBSUMsR0FBSixDQUFRLFVBQVNJLEdBQVQsRUFBY0MsR0FBZCxFQUFtQkMsSUFBbkIsRUFBeUI7QUFDL0JDLFVBQVEsY0FBUixFQUF3QkgsR0FBeEIsRUFBNkJDLEdBQTdCLEVBQWtDQyxJQUFsQztBQUNELENBRkQ7O0FBSUE7QUFDQVAsSUFBSVMsR0FBSixDQUFRLEdBQVIsRUFBYSxVQUFTSixHQUFULEVBQWNDLEdBQWQsRUFBbUJDLElBQW5CLEVBQXlCO0FBQ3BDQyxVQUFRLHdCQUFSLEVBQWtDSCxJQUFJSyxJQUF0QyxFQUE0QyxVQUFTQyxHQUFULEVBQWNDLElBQWQsRUFBb0I7QUFDOUQsUUFBSUQsR0FBSixFQUFTLE9BQU9KLEtBQUtJLEdBQUwsQ0FBUDtBQUNUTCxRQUFJTyxJQUFKLENBQVNELElBQVQ7QUFDRCxHQUhEO0FBSUQsQ0FMRDs7QUFPQTtBQUNBO0FBQ0E7QUFDQSxJQUFNRSxVQUFVLG1CQUFTQyxLQUFULENBQWUsVUFBZixDQUFoQjs7QUFFQUQsUUFBUUUsRUFBUixDQUFXLE9BQVgsRUFBb0IsWUFBVztBQUM3QkYsVUFBUUUsRUFBUixDQUFXLEtBQVgsRUFBa0IsWUFBVztBQUMzQkMsWUFBUUMsR0FBUixDQUFZLDRDQUFaO0FBQ0Esd0JBQVlWLFFBQVFXLEtBQXBCLEVBQTJCQyxPQUEzQixDQUFtQyxVQUFTQyxFQUFULEVBQWE7QUFDOUMsVUFBSSxxQkFBcUJDLElBQXJCLENBQTBCRCxFQUExQixDQUFKLEVBQW1DLE9BQU9iLFFBQVFXLEtBQVIsQ0FBY0UsRUFBZCxDQUFQO0FBQ3BDLEtBRkQ7QUFHRCxHQUxEO0FBTUQsQ0FQRDs7QUFTQTtBQUNBO0FBQ0F0QixTQUFTd0IsTUFBVCxDQUFnQixNQUFoQixFQUF3QixZQUFXO0FBQ2pDTixVQUFRQyxHQUFSLENBQVksNENBQVo7QUFDQSxzQkFBWVYsUUFBUVcsS0FBcEIsRUFBMkJDLE9BQTNCLENBQW1DLFVBQVNDLEVBQVQsRUFBYTtBQUM5QyxRQUFJLHFCQUFxQkMsSUFBckIsQ0FBMEJELEVBQTFCLENBQUosRUFBbUMsT0FBT2IsUUFBUVcsS0FBUixDQUFjRSxFQUFkLENBQVA7QUFDcEMsR0FGRDtBQUdELENBTEQ7O0FBT0EsSUFBTUcsU0FBUyxlQUFLQyxZQUFMLENBQWtCekIsR0FBbEIsQ0FBZjtBQUNBd0IsT0FBT0UsTUFBUCxDQUFjLElBQWQsRUFBb0IsV0FBcEIsRUFBaUMsVUFBU2YsR0FBVCxFQUFjO0FBQzdDLE1BQUlBLEdBQUosRUFBUyxNQUFNQSxHQUFOOztBQUVULE1BQU1nQixPQUFPSCxPQUFPSSxPQUFQLEVBQWI7O0FBRUFYLFVBQVFDLEdBQVIsQ0FBWSwyQkFBWixFQUF5Q1MsS0FBS0MsT0FBOUMsRUFBdURELEtBQUtFLElBQTVEO0FBQ0QsQ0FORCIsImZpbGUiOiJzZXJ2ZXIuanMiLCJzb3VyY2VSb290IjoiL2FwcCIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBjaG9raWRhciBmcm9tICdjaG9raWRhcic7XG5pbXBvcnQgY29uZmlnIGZyb20gJy4vd2VicGFjay5jb25maWcnO1xuaW1wb3J0IGNzc01vZHVsZXNSZXF1aXJlSG9vayBmcm9tICdjc3MtbW9kdWxlcy1yZXF1aXJlLWhvb2snO1xuaW1wb3J0IGV4cHJlc3MgZnJvbSAnZXhwcmVzcyc7XG5pbXBvcnQgaHR0cCBmcm9tICdodHRwJztcbmltcG9ydCB3ZWJwYWNrIGZyb20gJ3dlYnBhY2snO1xuaW1wb3J0IHdlYnBhY2tEZXZNaWRkbGV3YXJlIGZyb20gJ3dlYnBhY2stZGV2LW1pZGRsZXdhcmUnO1xuaW1wb3J0IHdlYnBhY2tIb3RNaWRkbGV3YXJlIGZyb20gJ3dlYnBhY2staG90LW1pZGRsZXdhcmUnO1xuXG5jc3NNb2R1bGVzUmVxdWlyZUhvb2soe2dlbmVyYXRlU2NvcGVkTmFtZTogJ1twYXRoXVtuYW1lXS1bbG9jYWxdJ30pO1xuY29uc3QgY29tcGlsZXIgPSB3ZWJwYWNrKGNvbmZpZyk7XG5jb25zdCBhcHAgPSBleHByZXNzKCk7XG5cbi8vIFNlcnZlIGhvdC1yZWxvYWRpbmcgYnVuZGxlIHRvIGNsaWVudFxuYXBwLnVzZSh3ZWJwYWNrRGV2TWlkZGxld2FyZShjb21waWxlciwge1xuICBub0luZm86IHRydWUsIHB1YmxpY1BhdGg6IGNvbmZpZy5vdXRwdXQucHVibGljUGF0aFxufSkpO1xuYXBwLnVzZSh3ZWJwYWNrSG90TWlkZGxld2FyZShjb21waWxlcikpO1xuXG4vLyBJbmNsdWRlIHNlcnZlciByb3V0ZXMgYXMgYSBtaWRkbGV3YXJlXG5hcHAudXNlKGZ1bmN0aW9uKHJlcSwgcmVzLCBuZXh0KSB7XG4gIHJlcXVpcmUoJy4vc2VydmVyL2FwcCcpKHJlcSwgcmVzLCBuZXh0KTtcbn0pO1xuXG4vLyBBbnl0aGluZyBlbHNlIGdldHMgcGFzc2VkIHRvIHRoZSBjbGllbnQgYXBwJ3Mgc2VydmVyIHJlbmRlcmluZ1xuYXBwLmdldCgnKicsIGZ1bmN0aW9uKHJlcSwgcmVzLCBuZXh0KSB7XG4gIHJlcXVpcmUoJy4vY2xpZW50L3NlcnZlci1yZW5kZXInKShyZXEucGF0aCwgZnVuY3Rpb24oZXJyLCBwYWdlKSB7XG4gICAgaWYgKGVycikgcmV0dXJuIG5leHQoZXJyKTtcbiAgICByZXMuc2VuZChwYWdlKTtcbiAgfSk7XG59KTtcblxuLy8gRG8gXCJob3QtcmVsb2FkaW5nXCIgb2YgZXhwcmVzcyBzdHVmZiBvbiB0aGUgc2VydmVyXG4vLyBUaHJvdyBhd2F5IGNhY2hlZCBtb2R1bGVzIGFuZCByZS1yZXF1aXJlIG5leHQgdGltZVxuLy8gRW5zdXJlIHRoZXJlJ3Mgbm8gaW1wb3J0YW50IHN0YXRlIGluIHRoZXJlIVxuY29uc3Qgd2F0Y2hlciA9IGNob2tpZGFyLndhdGNoKCcuL3NlcnZlcicpO1xuXG53YXRjaGVyLm9uKCdyZWFkeScsIGZ1bmN0aW9uKCkge1xuICB3YXRjaGVyLm9uKCdhbGwnLCBmdW5jdGlvbigpIHtcbiAgICBjb25zb2xlLmxvZyhcIkNsZWFyaW5nIC9zZXJ2ZXIvIG1vZHVsZSBjYWNoZSBmcm9tIHNlcnZlclwiKTtcbiAgICBPYmplY3Qua2V5cyhyZXF1aXJlLmNhY2hlKS5mb3JFYWNoKGZ1bmN0aW9uKGlkKSB7XG4gICAgICBpZiAoL1tcXC9cXFxcXXNlcnZlcltcXC9cXFxcXS8udGVzdChpZCkpIGRlbGV0ZSByZXF1aXJlLmNhY2hlW2lkXTtcbiAgICB9KTtcbiAgfSk7XG59KTtcblxuLy8gRG8gXCJob3QtcmVsb2FkaW5nXCIgb2YgcmVhY3Qgc3R1ZmYgb24gdGhlIHNlcnZlclxuLy8gVGhyb3cgYXdheSB0aGUgY2FjaGVkIGNsaWVudCBtb2R1bGVzIGFuZCBsZXQgdGhlbSBiZSByZS1yZXF1aXJlZCBuZXh0IHRpbWVcbmNvbXBpbGVyLnBsdWdpbignZG9uZScsIGZ1bmN0aW9uKCkge1xuICBjb25zb2xlLmxvZyhcIkNsZWFyaW5nIC9jbGllbnQvIG1vZHVsZSBjYWNoZSBmcm9tIHNlcnZlclwiKTtcbiAgT2JqZWN0LmtleXMocmVxdWlyZS5jYWNoZSkuZm9yRWFjaChmdW5jdGlvbihpZCkge1xuICAgIGlmICgvW1xcL1xcXFxdY2xpZW50W1xcL1xcXFxdLy50ZXN0KGlkKSkgZGVsZXRlIHJlcXVpcmUuY2FjaGVbaWRdO1xuICB9KTtcbn0pO1xuXG5jb25zdCBzZXJ2ZXIgPSBodHRwLmNyZWF0ZVNlcnZlcihhcHApO1xuc2VydmVyLmxpc3RlbigzMDAwLCAnbG9jYWxob3N0JywgZnVuY3Rpb24oZXJyKSB7XG4gIGlmIChlcnIpIHRocm93IGVycjtcblxuICBjb25zdCBhZGRyID0gc2VydmVyLmFkZHJlc3MoKTtcblxuICBjb25zb2xlLmxvZygnTGlzdGVuaW5nIGF0IGh0dHA6Ly8lczolZCcsIGFkZHIuYWRkcmVzcywgYWRkci5wb3J0KTtcbn0pO1xuIl19",
+    "code": "'use strict';\n\nvar _stringify = require('babel-runtime/core-js/json/stringify');\n\nvar _stringify2 = _interopRequireDefault(_stringify);\n\nvar _keys = require('babel-runtime/core-js/object/keys');\n\nvar _keys2 = _interopRequireDefault(_keys);\n\nvar _chokidar = require('chokidar');\n\nvar _chokidar2 = _interopRequireDefault(_chokidar);\n\nvar _webpack = require('./webpack.config');\n\nvar _webpack2 = _interopRequireDefault(_webpack);\n\nvar _cssModulesRequireHook = require('css-modules-require-hook');\n\nvar _cssModulesRequireHook2 = _interopRequireDefault(_cssModulesRequireHook);\n\nvar _express = require('express');\n\nvar _express2 = _interopRequireDefault(_express);\n\nvar _http = require('http');\n\nvar _http2 = _interopRequireDefault(_http);\n\nvar _webpack3 = require('webpack');\n\nvar _webpack4 = _interopRequireDefault(_webpack3);\n\nvar _webpackDevMiddleware = require('webpack-dev-middleware');\n\nvar _webpackDevMiddleware2 = _interopRequireDefault(_webpackDevMiddleware);\n\nvar _webpackHotMiddleware = require('webpack-hot-middleware');\n\nvar _webpackHotMiddleware2 = _interopRequireDefault(_webpackHotMiddleware);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n(0, _cssModulesRequireHook2.default)({ generateScopedName: '[path][name]-[local]' });\nvar compiler = (0, _webpack4.default)(_webpack2.default);\nvar app = (0, _express2.default)();\n\n// Serve hot-reloading bundle to client\napp.use((0, _webpackDevMiddleware2.default)(compiler, {\n  noInfo: true, publicPath: _webpack2.default.output.publicPath\n}));\napp.use((0, _webpackHotMiddleware2.default)(compiler));\n\n// Include server routes as a middleware\napp.use(function (req, res, next) {\n  require('./server/app')(req, res, next);\n});\nvar consoleContents = [];\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op);\n  if (request.params.op === 'clear') {\n    consoleContents = [];\n  }\n  response.send(consoleContents);\n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function (req, res, next) {\n  require('./client/server-render')(req.path, function (err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nvar watcher = _chokidar2.default.watch('./server');\n\nwatcher.on('ready', function () {\n  watcher.on('all', function () {\n    console.log(\"Clearing /server/ module cache from server\");\n    (0, _keys2.default)(require.cache).forEach(function (id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function () {\n  console.log(\"Clearing /client/ module cache from server\");\n  (0, _keys2.default)(require.cache).forEach(function (id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nvar server = _http2.default.createServer(app);\nserver.listen(3000, 'localhost', function (err) {\n  if (err) throw err;\n\n  var addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nvar tickNo = 0;\nvar bindConsole = function bindConsole() {\n  var oldLog = console.log.bind(console);\n  oldLog('this');\n\n  var newLog = function newLog() {\n    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {\n      args[_key] = arguments[_key];\n    }\n\n    oldLog.apply(undefined, args);\n    oldLog(\"from newlog\");\n    if (consoleContents.length < 10) consoleContents.push((0, _stringify2.default)(args));\n    //oldLog(consoleContents)\n  };\n\n  newLog('thihs', 'and that');\n  console.log = newLog;\n};\nbindConsole();\nconsole.log(\"After bind\");\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNlcnZlci5qcyJdLCJuYW1lcyI6WyJnZW5lcmF0ZVNjb3BlZE5hbWUiLCJjb21waWxlciIsImFwcCIsInVzZSIsIm5vSW5mbyIsInB1YmxpY1BhdGgiLCJvdXRwdXQiLCJyZXEiLCJyZXMiLCJuZXh0IiwicmVxdWlyZSIsImNvbnNvbGVDb250ZW50cyIsImdldCIsInJlcXVlc3QiLCJyZXNwb25zZSIsImNvbnNvbGUiLCJsb2ciLCJwYXJhbXMiLCJvcCIsInNlbmQiLCJwYXRoIiwiZXJyIiwicGFnZSIsIndhdGNoZXIiLCJ3YXRjaCIsIm9uIiwiY2FjaGUiLCJmb3JFYWNoIiwiaWQiLCJ0ZXN0IiwicGx1Z2luIiwic2VydmVyIiwiY3JlYXRlU2VydmVyIiwibGlzdGVuIiwiYWRkciIsImFkZHJlc3MiLCJwb3J0IiwidGlja05vIiwiYmluZENvbnNvbGUiLCJvbGRMb2ciLCJiaW5kIiwibmV3TG9nIiwiYXJncyIsImxlbmd0aCIsInB1c2giXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFBQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7Ozs7QUFFQSxxQ0FBc0IsRUFBQ0Esb0JBQW9CLHNCQUFyQixFQUF0QjtBQUNBLElBQU1DLFdBQVcseUNBQWpCO0FBQ0EsSUFBTUMsTUFBTSx3QkFBWjs7QUFFQTtBQUNBQSxJQUFJQyxHQUFKLENBQVEsb0NBQXFCRixRQUFyQixFQUErQjtBQUNyQ0csVUFBUSxJQUQ2QixFQUN2QkMsWUFBWSxrQkFBT0MsTUFBUCxDQUFjRDtBQURILENBQS9CLENBQVI7QUFHQUgsSUFBSUMsR0FBSixDQUFRLG9DQUFxQkYsUUFBckIsQ0FBUjs7QUFFQTtBQUNBQyxJQUFJQyxHQUFKLENBQVEsVUFBU0ksR0FBVCxFQUFjQyxHQUFkLEVBQW1CQyxJQUFuQixFQUF5QjtBQUMvQkMsVUFBUSxjQUFSLEVBQXdCSCxHQUF4QixFQUE2QkMsR0FBN0IsRUFBa0NDLElBQWxDO0FBQ0QsQ0FG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dCI6Ii9hcHAiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgY2hva2lkYXIgZnJvbSAnY2hva2lkYXInO1xuaW1wb3J0IGNvbmZpZyBmcm9tICcuL3dlYnBhY2suY29uZmlnJztcbmltcG9ydCBjc3NNb2R1bGVzUmVxdWlyZUhvb2sgZnJvbSAnY3NzLW1vZHVsZXMtcmVxdWlyZS1ob29rJztcbmltcG9ydCBleHByZXNzIGZyb20gJ2V4cHJlc3MnO1xuaW1wb3J0IGh0dHAgZnJvbSAnaHR0cCc7XG5pbXBvcnQgd2VicGFjayBmcm9tICd3ZWJwYWNrJztcbmltcG9ydCB3ZWJwYWNrRGV2TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWRldi1taWRkbGV3YXJlJztcbmltcG9ydCB3ZWJwYWNrSG90TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWhvdC1taWRkbGV3YXJlJztcblxuY3NzTW9kdWxlc1JlcXVpcmVIb29rKHtnZW5lcmF0ZVNjb3BlZE5hbWU6ICdbcGF0aF1bbmFtZV0tW2xvY2FsXSd9KTtcbmNvbnN0IGNvbXBpbGVyID0gd2VicGFjayhjb25maWcpO1xuY29uc3QgYXBwID0gZXhwcmVzcygpO1xuXG4vLyBTZXJ2ZSBob3QtcmVsb2FkaW5nIGJ1bmRsZSB0byBjbGllbnRcbmFwcC51c2Uod2VicGFja0Rldk1pZGRsZXdhcmUoY29tcGlsZXIsIHtcbiAgbm9JbmZvOiB0cnVlLCBwdWJsaWNQYXRoOiBjb25maWcub3V0cHV0LnB1YmxpY1BhdGhcbn0pKTtcbmFwcC51c2Uod2VicGFja0hvdE1pZGRsZXdhcmUoY29tcGlsZXIpKTtcblxuLy8gSW5jbHVkZSBzZXJ2ZXIgcm91dGVzIGFzIGEgbWlkZGxld2FyZVxuYXBwLnVzZShmdW5jdGlvbihyZXEsIHJlcywgbmV4dCkge1xuICByZXF1aXJlKCcuL3NlcnZlci9hcHAnKShyZXEsIHJlcywgbmV4dCk7XG59KTtcbmxldCBjb25zb2xlQ29udGVudHMgPSBbXVxuXG5cblxuXG5hcHAuZ2V0KFwiL2NvbnNvbGUvOm9wXCIsIGZ1bmN0aW9uIChyZXF1ZXN0LCByZXNwb25zZSkge1xuICBjb25zb2xlLmxvZyhyZXF1ZXN0LnBhcmFtcy5vcClcbiAgaWYocmVxdWVzdC5wYXJhbXMub3A9PT0nY2xlYXInKXtcbiAgICBjb25zb2xlQ29udGVudHMgPSBbXVxuICB9XG4gIHJlc3BvbnNlLnNlbmQoY29uc29sZUNvbnRlbnRzKTsgXG59KTtcbi8vIEFueXRoaW5nIGVsc2UgZ2V0cyBwYXNzZWQgdG8gdGhlIGNsaWVudCBhcHAncyBzZXJ2ZXIgcmVuZGVyaW5nXG5hcHAuZ2V0KCcqJywgZnVuY3Rpb24ocmVxLCByZXMsIG5leHQpIHtcbiAgcmVxdWlyZSgnLi9jbGllbnQvc2VydmVyLXJlbmRlcicpKHJlcS5wYXRoLCBmdW5jdGlvbihlcnIsIHBhZ2UpIHtcbiAgICBpZiAoZXJyKSByZXR1cm4gbmV4dChlcnIpO1xuICAgIHJlcy5zZW5kKHBhZ2UpO1xuICB9KTtcbn0pO1xuXG4vLyBEbyBcImhvdC1yZWxvYWRpbmdcIiBvZiBleHByZXNzIHN0dWZmIG9uIHRoZSBzZXJ2ZXJcbi8vIFRocm93IGF3YXkgY2FjaGVkIG1vZHVsZXMgYW5kIHJlLXJlcXVpcmUgbmV4dCB0aW1lXG4vLyBFbnN1cmUgdGhlcmUncyBubyBpbXBvcnRhbnQgc3RhdGUgaW4gdGhlcmUhXG5jb25zdCB3YXRjaGVyID0gY2hva2lkYXIud2F0Y2goJy4vc2VydmVyJyk7XG5cbndhdGNoZXIub24oJ3JlYWR5JywgZnVuY3Rpb24oKSB7XG4gIHdhdGNoZXIub24oJ2FsbCcsIGZ1bmN0aW9uKCkge1xuICAgIGNvbnNvbGUubG9nKFwiQ2xlYXJpbmcgL3NlcnZlci8gbW9kdWxlIGNhY2hlIGZyb20gc2VydmVyXCIpO1xuICAgIE9iamVjdC5rZXlzKHJlcXVpcmUuY2FjaGUpLmZvckVhY2goZnVuY3Rpb24oaWQpIHtcbiAgICAgIGlmICgvW1xcL1xcXFxdc2VydmVyW1xcL1xcXFxdLy50ZXN0KGlkKSkgZGVsZXRlIHJlcXVpcmUuY2FjaGVbaWRdO1xuICAgIH0pO1xuICB9KTtcbn0pO1xuXG4vLyBEbyBcImhvdC1yZWxvYWRpbmdcIiBvZiByZWFjdCBzdHVmZiBvbiB0aGUgc2VydmVyXG4vLyBUaHJvdyBhd2F5IHRoZSBjYWNoZWQgY2xpZW50IG1vZHVsZXMgYW5kIGxldCB0aGVtIGJlIHJlLXJlcXVpcmVkIG5leHQgdGltZVxuY29tcGlsZXIucGx1Z2luKCdkb25lJywgZnVuY3Rpb24oKSB7XG4gIGNvbnNvbGUubG9nKFwiQ2xlYXJpbmcgL2NsaWVudC8gbW9kdWxlIGNhY2hlIGZyb20gc2VydmVyXCIpO1xuICBPYmplY3Qua2V5cyhyZXF1aXJlLmNhY2hlKS5mb3JFYWNoKGZ1bmN0aW9uKGlkKSB7XG4gICAgaWYgKC9bXFwvXFxcXF1jbGllbnRbXFwvXFxcXF0vLnRlc3QoaWQpKSBkZWxldGUgcmVxdWlyZS5jYWNoZVtpZF07XG4gIH0pO1xufSk7XG5cbmNvbnN0IHNlcnZlciA9IGh0dHAuY3JlYXRlU2VydmVyKGFwcCk7XG5zZXJ2ZXIubGlzdGVuKDMwMDAsICdsb2NhbGhvc3QnLCBmdW5jdGlvbihlcnIpIHtcbiAgaWYgKGVycikgdGhyb3cgZXJyO1xuXG4gIGNvbnN0IGFkZHIgPSBzZXJ2ZXIuYWRkcmVzcygpO1xuXG4gIGNvbnNvbGUubG9nKCdMaXN0ZW5pbmcgYXQgaHR0cDovLyVzOiVkJywgYWRkci5hZGRyZXNzLCBhZGRyLnBvcnQpO1xufSk7XG5sZXQgdGlja05vID0gMFxubGV0IGJpbmRDb25zb2xlID0gKCkgPT4ge1xuICBsZXQgb2xkTG9nID0gY29uc29sZS5sb2cuYmluZChjb25zb2xlKVxuICBvbGRMb2coJ3RoaXMnKVxuXG4gIGxldCBuZXdMb2cgPSAoLi4uYXJncykgPT4ge1xuICAgIG9sZExvZyguLi5hcmdzKTtcbiAgICBvbGRMb2coXCJmcm9tIG5ld2xvZ1wiKVxuICAgIGlmIChjb25zb2xlQ29udGVudHMubGVuZ3RoIDwgMTApXG4gICAgICBjb25zb2xlQ29udGVudHMucHVzaChKU09OLnN0cmluZ2lmeShhcmdzKSlcbiAgICAvL29sZExvZyhjb25zb2xlQ29udGVudHMpXG4gIH1cblxuICBuZXdMb2coJ3RoaWhzJywnYW5kIHRoYXQnKSBcbiAgY29uc29sZS5sb2cgPSBuZXdMb2dcbn1cbmJpbmRDb25zb2xlKClcbmNvbnNvbGUubG9nKFwiQWZ0ZXIgYmluZFwiKTsgICJdfQ==",
     "ast": null,
     "map": {
       "version": 3,
@@ -873,16 +873,21 @@
         "res",
         "next",
         "require",
+        "consoleContents",
         "get",
+        "request",
+        "response",
+        "console",
+        "log",
+        "params",
+        "op",
+        "send",
         "path",
         "err",
         "page",
-        "send",
         "watcher",
         "watch",
         "on",
-        "console",
-        "log",
         "cache",
         "forEach",
         "id",
@@ -893,16 +898,24 @@
         "listen",
         "addr",
         "address",
-        "port"
+        "port",
+        "tickNo",
+        "bindConsole",
+        "oldLog",
+        "bind",
+        "newLog",
+        "args",
+        "length",
+        "push"
       ],
-      "mappings": ";;;;;;AAAA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;;;AAEA,qCAAsB,EAACA,oBAAoB,sBAArB,EAAtB;AACA,IAAMC,WAAW,yCAAjB;AACA,IAAMC,MAAM,wBAAZ;;AAEA;AACAA,IAAIC,GAAJ,CAAQ,oCAAqBF,QAArB,EAA+B;AACrCG,UAAQ,IAD6B,EACvBC,YAAY,kBAAOC,MAAP,CAAcD;AADH,CAA/B,CAAR;AAGAH,IAAIC,GAAJ,CAAQ,oCAAqBF,QAArB,CAAR;;AAEA;AACAC,IAAIC,GAAJ,CAAQ,UAASI,GAAT,EAAcC,GAAd,EAAmBC,IAAnB,EAAyB;AAC/BC,UAAQ,cAAR,EAAwBH,GAAxB,EAA6BC,GAA7B,EAAkCC,IAAlC;AACD,CAFD;;AAIA;AACAP,IAAIS,GAAJ,CAAQ,GAAR,EAAa,UAASJ,GAAT,EAAcC,GAAd,EAAmBC,IAAnB,EAAyB;AACpCC,UAAQ,wBAAR,EAAkCH,IAAIK,IAAtC,EAA4C,UAASC,GAAT,EAAcC,IAAd,EAAoB;AAC9D,QAAID,GAAJ,EAAS,OAAOJ,KAAKI,GAAL,CAAP;AACTL,QAAIO,IAAJ,CAASD,IAAT;AACD,GAHD;AAID,CALD;;AAOA;AACA;AACA;AACA,IAAME,UAAU,mBAASC,KAAT,CAAe,UAAf,CAAhB;;AAEAD,QAAQE,EAAR,CAAW,OAAX,EAAoB,YAAW;AAC7BF,UAAQE,EAAR,CAAW,KAAX,EAAkB,YAAW;AAC3BC,YAAQC,GAAR,CAAY,4CAAZ;AACA,wBAAYV,QAAQW,KAApB,EAA2BC,OAA3B,CAAmC,UAASC,EAAT,EAAa;AAC9C,UAAI,qBAAqBC,IAArB,CAA0BD,EAA1B,CAAJ,EAAmC,OAAOb,QAAQW,KAAR,CAAcE,EAAd,CAAP;AACpC,KAFD;AAGD,GALD;AAMD,CAPD;;AASA;AACA;AACAtB,SAASwB,MAAT,CAAgB,MAAhB,EAAwB,YAAW;AACjCN,UAAQC,GAAR,CAAY,4CAAZ;AACA,sBAAYV,QAAQW,KAApB,EAA2BC,OAA3B,CAAmC,UAASC,EAAT,EAAa;AAC9C,QAAI,qBAAqBC,IAArB,CAA0BD,EAA1B,CAAJ,EAAmC,OAAOb,QAAQW,KAAR,CAAcE,EAAd,CAAP;AACpC,GAFD;AAGD,CALD;;AAOA,IAAMG,SAAS,eAAKC,YAAL,CAAkBzB,GAAlB,CAAf;AACAwB,OAAOE,MAAP,CAAc,IAAd,EAAoB,WAApB,EAAiC,UAASf,GAAT,EAAc;AAC7C,MAAIA,GAAJ,EAAS,MAAMA,GAAN;;AAET,MAAMgB,OAAOH,OAAOI,OAAP,EAAb;;AAEAX,UAAQC,GAAR,CAAY,2BAAZ,EAAyCS,KAAKC,OAA9C,EAAuDD,KAAKE,IAA5D;AACD,CAND",
+      "mappings": "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",
       "file": "server.js",
       "sourceRoot": "/app",
       "sourcesContent": [
-        "import chokidar from 'chokidar';\nimport config from './webpack.config';\nimport cssModulesRequireHook from 'css-modules-require-hook';\nimport express from 'express';\nimport http from 'http';\nimport webpack from 'webpack';\nimport webpackDevMiddleware from 'webpack-dev-middleware';\nimport webpackHotMiddleware from 'webpack-hot-middleware';\n\ncssModulesRequireHook({generateScopedName: '[path][name]-[local]'});\nconst compiler = webpack(config);\nconst app = express();\n\n// Serve hot-reloading bundle to client\napp.use(webpackDevMiddleware(compiler, {\n  noInfo: true, publicPath: config.output.publicPath\n}));\napp.use(webpackHotMiddleware(compiler));\n\n// Include server routes as a middleware\napp.use(function(req, res, next) {\n  require('./server/app')(req, res, next);\n});\n\n// Anything else gets passed to the client app's server rendering\napp.get('*', function(req, res, next) {\n  require('./client/server-render')(req.path, function(err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nconst watcher = chokidar.watch('./server');\n\nwatcher.on('ready', function() {\n  watcher.on('all', function() {\n    console.log(\"Clearing /server/ module cache from server\");\n    Object.keys(require.cache).forEach(function(id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function() {\n  console.log(\"Clearing /client/ module cache from server\");\n  Object.keys(require.cache).forEach(function(id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nconst server = http.createServer(app);\nserver.listen(3000, 'localhost', function(err) {\n  if (err) throw err;\n\n  const addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\n"
+        "import chokidar from 'chokidar';\nimport config from './webpack.config';\nimport cssModulesRequireHook from 'css-modules-require-hook';\nimport express from 'express';\nimport http from 'http';\nimport webpack from 'webpack';\nimport webpackDevMiddleware from 'webpack-dev-middleware';\nimport webpackHotMiddleware from 'webpack-hot-middleware';\n\ncssModulesRequireHook({generateScopedName: '[path][name]-[local]'});\nconst compiler = webpack(config);\nconst app = express();\n\n// Serve hot-reloading bundle to client\napp.use(webpackDevMiddleware(compiler, {\n  noInfo: true, publicPath: config.output.publicPath\n}));\napp.use(webpackHotMiddleware(compiler));\n\n// Include server routes as a middleware\napp.use(function(req, res, next) {\n  require('./server/app')(req, res, next);\n});\nlet consoleContents = []\n\n\n\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op)\n  if(request.params.op==='clear'){\n    consoleContents = []\n  }\n  response.send(consoleContents); \n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function(req, res, next) {\n  require('./client/server-render')(req.path, function(err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nconst watcher = chokidar.watch('./server');\n\nwatcher.on('ready', function() {\n  watcher.on('all', function() {\n    console.log(\"Clearing /server/ module cache from server\");\n    Object.keys(require.cache).forEach(function(id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function() {\n  console.log(\"Clearing /client/ module cache from server\");\n  Object.keys(require.cache).forEach(function(id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nconst server = http.createServer(app);\nserver.listen(3000, 'localhost', function(err) {\n  if (err) throw err;\n\n  const addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nlet tickNo = 0\nlet bindConsole = () => {\n  let oldLog = console.log.bind(console)\n  oldLog('this')\n\n  let newLog = (...args) => {\n    oldLog(...args);\n    oldLog(\"from newlog\")\n    if (consoleContents.length < 10)\n      consoleContents.push(JSON.stringify(args))\n    //oldLog(consoleContents)\n  }\n\n  newLog('thihs','and that') \n  console.log = newLog\n}\nbindConsole()\nconsole.log(\"After bind\");  "
       ]
     },
-    "mtime": 1525035267300
+    "mtime": 1525230677071
   },
   "{\"filename\":\"/app/webpack.config.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0": {
     "metadata": {
@@ -1160,5 +1173,1662 @@
       ]
     },
     "mtime": 1520333640000
+  },
+  "{\"filename\":\"/app/server/app.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/server\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "express",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "express"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/server/app.js",
+      "filenameRelative": "/app/server/app.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "app.js",
+      "sourceFileName": "app.js",
+      "sourceRoot": "/app/server",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app/server",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "app"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nvar _express = require('express');\n\nvar _express2 = _interopRequireDefault(_express);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar app = _express2.default.Router();\n\napp.get('/whoami', function (req, res) {\n  console.log(\"WHO BBBB\");\n  res.send(\"You are a real winner\");\n});\napp.get('/whoami', function (req, res) {\n  console.log(\"WHO 2\");\n  res.send(\"You are quite OKQ\");\n});\n\nmodule.exports = app;\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImFwcC5qcyJdLCJuYW1lcyI6WyJhcHAiLCJSb3V0ZXIiLCJnZXQiLCJyZXEiLCJyZXMiLCJjb25zb2xlIiwibG9nIiwic2VuZCIsIm1vZHVsZSIsImV4cG9ydHMiXSwibWFwcGluZ3MiOiI7O0FBQUE7Ozs7OztBQUVBLElBQU1BLE1BQU0sa0JBQVFDLE1BQVIsRUFBWjs7QUFFQUQsSUFBSUUsR0FBSixDQUFRLFNBQVIsRUFBbUIsVUFBQ0MsR0FBRCxFQUFNQyxHQUFOLEVBQWM7QUFDL0JDLFVBQVFDLEdBQVIsQ0FBWSxVQUFaO0FBQ0FGLE1BQUlHLElBQUosQ0FBUyx1QkFBVDtBQUNELENBSEQ7QUFJQVAsSUFBSUUsR0FBSixDQUFRLFNBQVIsRUFBbUIsVUFBQ0MsR0FBRCxFQUFNQyxHQUFOLEVBQWM7QUFDL0JDLFVBQVFDLEdBQVIsQ0FBWSxPQUFaO0FBQ0FGLE1BQUlHLElBQUosQ0FBUyxtQkFBVDtBQUNELENBSEQ7O0FBS0FDLE9BQU9DLE9BQVAsR0FBaUJULEdBQWpCIiwiZmlsZSI6ImFwcC5qcyIsInNvdXJjZVJvb3QiOiIvYXBwL3NlcnZlciIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBleHByZXNzIGZyb20gJ2V4cHJlc3MnO1xuXG5jb25zdCBhcHAgPSBleHByZXNzLlJvdXRlcigpO1xuXG5hcHAuZ2V0KCcvd2hvYW1pJywgKHJlcSwgcmVzKSA9PiB7XG4gIGNvbnNvbGUubG9nKFwiV0hPIEJCQkJcIilcbiAgcmVzLnNlbmQoXCJZb3UgYXJlIGEgcmVhbCB3aW5uZXJcIik7XG59KTtcbmFwcC5nZXQoJy93aG9hbWknLCAocmVxLCByZXMpID0+IHtcbiAgY29uc29sZS5sb2coXCJXSE8gMlwiKVxuICByZXMuc2VuZChcIllvdSBhcmUgcXVpdGUgT0tRXCIpO1xufSk7XG5cbm1vZHVsZS5leHBvcnRzID0gYXBwO1xuIl19",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "app.js"
+      ],
+      "names": [
+        "app",
+        "Router",
+        "get",
+        "req",
+        "res",
+        "console",
+        "log",
+        "send",
+        "module",
+        "exports"
+      ],
+      "mappings": ";;AAAA;;;;;;AAEA,IAAMA,MAAM,kBAAQC,MAAR,EAAZ;;AAEAD,IAAIE,GAAJ,CAAQ,SAAR,EAAmB,UAACC,GAAD,EAAMC,GAAN,EAAc;AAC/BC,UAAQC,GAAR,CAAY,UAAZ;AACAF,MAAIG,IAAJ,CAAS,uBAAT;AACD,CAHD;AAIAP,IAAIE,GAAJ,CAAQ,SAAR,EAAmB,UAACC,GAAD,EAAMC,GAAN,EAAc;AAC/BC,UAAQC,GAAR,CAAY,OAAZ;AACAF,MAAIG,IAAJ,CAAS,mBAAT;AACD,CAHD;;AAKAC,OAAOC,OAAP,GAAiBT,GAAjB",
+      "file": "app.js",
+      "sourceRoot": "/app/server",
+      "sourcesContent": [
+        "import express from 'express';\n\nconst app = express.Router();\n\napp.get('/whoami', (req, res) => {\n  console.log(\"WHO BBBB\")\n  res.send(\"You are a real winner\");\n});\napp.get('/whoami', (req, res) => {\n  console.log(\"WHO 2\")\n  res.send(\"You are quite OKQ\");\n});\n\nmodule.exports = app;\n"
+      ]
+    },
+    "mtime": 1525038485091
+  },
+  "{\"filename\":\"/app/client/server-render.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/client\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "./components/App",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "App"
+              }
+            ]
+          },
+          {
+            "source": "./store",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "configureStore"
+              }
+            ]
+          },
+          {
+            "source": "fs",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "fs"
+              }
+            ]
+          },
+          {
+            "source": "react",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "React"
+              }
+            ]
+          },
+          {
+            "source": "react-redux",
+            "imported": [
+              "Provider"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "Provider",
+                "local": "Provider"
+              }
+            ]
+          },
+          {
+            "source": "react-dom/server",
+            "imported": [
+              "renderToString"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "renderToString",
+                "local": "renderToString"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/client/server-render.js",
+      "filenameRelative": "/app/client/server-render.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "server-render.js",
+      "sourceFileName": "server-render.js",
+      "sourceRoot": "/app/client",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app/client",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "server-render"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nvar _stringify = require('babel-runtime/core-js/json/stringify');\n\nvar _stringify2 = _interopRequireDefault(_stringify);\n\nvar _App = require('./components/App');\n\nvar _App2 = _interopRequireDefault(_App);\n\nvar _store = require('./store');\n\nvar _store2 = _interopRequireDefault(_store);\n\nvar _fs = require('fs');\n\nvar _fs2 = _interopRequireDefault(_fs);\n\nvar _react = require('react');\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _reactRedux = require('react-redux');\n\nvar _server = require('react-dom/server');\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n// eslint-disable-next-line no-sync\nvar template = _fs2.default.readFileSync(__dirname + '/../index.html', 'utf8');\n\nfunction renderApp(path, callback) {\n  var store = (0, _store2.default)();\n  var state = store.getState();\n\n  var rendered = (0, _server.renderToString)(_react2.default.createElement(\n    _reactRedux.Provider,\n    { store: store },\n    _react2.default.createElement(_App2.default, null)\n  ));\n\n  var page = template.replace('<!-- CONTENT -->', rendered).replace('\"-- STORES --\"', (0, _stringify2.default)(state));\n\n  callback(null, page);\n}\n\nmodule.exports = renderApp;\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNlcnZlci1yZW5kZXIuanMiXSwibmFtZXMiOlsidGVtcGxhdGUiLCJyZWFkRmlsZVN5bmMiLCJfX2Rpcm5hbWUiLCJyZW5kZXJBcHAiLCJwYXRoIiwiY2FsbGJhY2siLCJzdG9yZSIsInN0YXRlIiwiZ2V0U3RhdGUiLCJyZW5kZXJlZCIsInBhZ2UiLCJyZXBsYWNlIiwibW9kdWxlIiwiZXhwb3J0cyJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUE7Ozs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7QUFDQTs7OztBQUVBO0FBQ0EsSUFBTUEsV0FBVyxhQUFHQyxZQUFILENBQWdCQyxZQUFZLGdCQUE1QixFQUE4QyxNQUE5QyxDQUFqQjs7QUFFQSxTQUFTQyxTQUFULENBQW1CQyxJQUFuQixFQUF5QkMsUUFBekIsRUFBbUM7QUFDakMsTUFBTUMsUUFBUSxzQkFBZDtBQUNBLE1BQU1DLFFBQVFELE1BQU1FLFFBQU4sRUFBZDs7QUFFQSxNQUFNQyxXQUFXLDRCQUNmO0FBQUE7QUFBQSxNQUFVLE9BQU9ILEtBQWpCO0FBQ0U7QUFERixHQURlLENBQWpCOztBQU1BLE1BQU1JLE9BQU9WLFNBQ1ZXLE9BRFUsQ0FDRixrQkFERSxFQUNrQkYsUUFEbEIsRUFFVkUsT0FGVSxDQUVGLGdCQUZFLEVBRWdCLHlCQUFlSixLQUFmLENBRmhCLENBQWI7O0FBSUFGLFdBQVMsSUFBVCxFQUFlSyxJQUFmO0FBQ0Q7O0FBRURFLE9BQU9DLE9BQVAsR0FBaUJWLFNBQWpCIiwiZmlsZSI6InNlcnZlci1yZW5kZXIuanMiLCJzb3VyY2VSb290IjoiL2FwcC9jbGllbnQiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgQXBwIGZyb20gJy4vY29tcG9uZW50cy9BcHAnO1xuaW1wb3J0IGNvbmZpZ3VyZVN0b3JlIGZyb20gJy4vc3RvcmUnO1xuaW1wb3J0IGZzIGZyb20gJ2ZzJztcbmltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyBQcm92aWRlciB9IGZyb20gJ3JlYWN0LXJlZHV4JztcbmltcG9ydCB7IHJlbmRlclRvU3RyaW5nIH0gZnJvbSAncmVhY3QtZG9tL3NlcnZlcic7XG5cbi8vIGVzbGludC1kaXNhYmxlLW5leHQtbGluZSBuby1zeW5jXG5jb25zdCB0ZW1wbGF0ZSA9IGZzLnJlYWRGaWxlU3luYyhfX2Rpcm5hbWUgKyAnLy4uL2luZGV4Lmh0bWwnLCAndXRmOCcpO1xuXG5mdW5jdGlvbiByZW5kZXJBcHAocGF0aCwgY2FsbGJhY2spIHtcbiAgY29uc3Qgc3RvcmUgPSBjb25maWd1cmVTdG9yZSgpO1xuICBjb25zdCBzdGF0ZSA9IHN0b3JlLmdldFN0YXRlKCk7XG5cbiAgY29uc3QgcmVuZGVyZWQgPSByZW5kZXJUb1N0cmluZyhcbiAgICA8UHJvdmlkZXIgc3RvcmU9e3N0b3JlfT5cbiAgICAgIDxBcHAgLz5cbiAgICA8L1Byb3ZpZGVyPlxuICApO1xuXG4gIGNvbnN0IHBhZ2UgPSB0ZW1wbGF0ZVxuICAgIC5yZXBsYWNlKCc8IS0tIENPTlRFTlQgLS0+JywgcmVuZGVyZWQpXG4gICAgLnJlcGxhY2UoJ1wiLS0gU1RPUkVTIC0tXCInLCBKU09OLnN0cmluZ2lmeShzdGF0ZSkpO1xuXG4gIGNhbGxiYWNrKG51bGwsIHBhZ2UpO1xufVxuXG5tb2R1bGUuZXhwb3J0cyA9IHJlbmRlckFwcDtcbiJdfQ==",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "server-render.js"
+      ],
+      "names": [
+        "template",
+        "readFileSync",
+        "__dirname",
+        "renderApp",
+        "path",
+        "callback",
+        "store",
+        "state",
+        "getState",
+        "rendered",
+        "page",
+        "replace",
+        "module",
+        "exports"
+      ],
+      "mappings": ";;;;;;AAAA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;AACA;;;;AAEA;AACA,IAAMA,WAAW,aAAGC,YAAH,CAAgBC,YAAY,gBAA5B,EAA8C,MAA9C,CAAjB;;AAEA,SAASC,SAAT,CAAmBC,IAAnB,EAAyBC,QAAzB,EAAmC;AACjC,MAAMC,QAAQ,sBAAd;AACA,MAAMC,QAAQD,MAAME,QAAN,EAAd;;AAEA,MAAMC,WAAW,4BACf;AAAA;AAAA,MAAU,OAAOH,KAAjB;AACE;AADF,GADe,CAAjB;;AAMA,MAAMI,OAAOV,SACVW,OADU,CACF,kBADE,EACkBF,QADlB,EAEVE,OAFU,CAEF,gBAFE,EAEgB,yBAAeJ,KAAf,CAFhB,CAAb;;AAIAF,WAAS,IAAT,EAAeK,IAAf;AACD;;AAEDE,OAAOC,OAAP,GAAiBV,SAAjB",
+      "file": "server-render.js",
+      "sourceRoot": "/app/client",
+      "sourcesContent": [
+        "import App from './components/App';\nimport configureStore from './store';\nimport fs from 'fs';\nimport React from 'react';\nimport { Provider } from 'react-redux';\nimport { renderToString } from 'react-dom/server';\n\n// eslint-disable-next-line no-sync\nconst template = fs.readFileSync(__dirname + '/../index.html', 'utf8');\n\nfunction renderApp(path, callback) {\n  const store = configureStore();\n  const state = store.getState();\n\n  const rendered = renderToString(\n    <Provider store={store}>\n      <App />\n    </Provider>\n  );\n\n  const page = template\n    .replace('<!-- CONTENT -->', rendered)\n    .replace('\"-- STORES --\"', JSON.stringify(state));\n\n  callback(null, page);\n}\n\nmodule.exports = renderApp;\n"
+      ]
+    },
+    "mtime": 1520333640000
+  },
+  "{\"filename\":\"/app/client/components/App.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/client/components\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "react",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "React"
+              }
+            ]
+          },
+          {
+            "source": "./App.css",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "styles"
+              }
+            ]
+          },
+          {
+            "source": "react-redux",
+            "imported": [
+              "connect"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "connect",
+                "local": "connect"
+              }
+            ]
+          },
+          {
+            "source": "./CountButton",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "CountButton"
+              }
+            ]
+          },
+          {
+            "source": "./Console",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "Console"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/client/components/App.js",
+      "filenameRelative": "/app/client/components/App.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "App.js",
+      "sourceFileName": "App.js",
+      "sourceRoot": "/app/client/components",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app/client/components",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "App"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _react = require('react');\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _App = require('./App.css');\n\nvar _App2 = _interopRequireDefault(_App);\n\nvar _reactRedux = require('react-redux');\n\nvar _CountButton = require('./CountButton');\n\nvar _CountButton2 = _interopRequireDefault(_CountButton);\n\nvar _Console = require('./Console');\n\nvar _Console2 = _interopRequireDefault(_Console);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar App = (0, _reactRedux.connect)(function (state) {\n  return { count: state };\n})(_react2.default.createClass({\n  displayName: 'App',\n\n  propTypes: {\n    count: _react2.default.PropTypes.object.isRequired,\n    dispatch: _react2.default.PropTypes.func.isRequired\n  },\n  render: function render() {\n    var _props = this.props,\n        count = _props.count,\n        dispatch = _props.dispatch;\n\n    return _react2.default.createElement(\n      'div',\n      null,\n      _react2.default.createElement(\n        'h1',\n        null,\n        'Demonstrations'\n      ),\n      _react2.default.createElement(_CountButton2.default, null),\n      _react2.default.createElement(_Console2.default, null),\n      _react2.default.createElement(\n        'p',\n        null,\n        _react2.default.createElement(\n          'a',\n          { href: '/whoami' },\n          'Server-only route'\n        )\n      )\n    );\n  }\n}));\n\nexports.default = App;\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkFwcC5qcyJdLCJuYW1lcyI6WyJBcHAiLCJjb3VudCIsInN0YXRlIiwiY3JlYXRlQ2xhc3MiLCJwcm9wVHlwZXMiLCJQcm9wVHlwZXMiLCJvYmplY3QiLCJpc1JlcXVpcmVkIiwiZGlzcGF0Y2giLCJmdW5jIiwicmVuZGVyIiwicHJvcHMiXSwibWFwcGluZ3MiOiI7Ozs7OztBQUFBOzs7O0FBQ0E7Ozs7QUFDQTs7QUFDQTs7OztBQUNBOzs7Ozs7QUFDQSxJQUFNQSxNQUFNLHlCQUFRO0FBQUEsU0FBVSxFQUFDQyxPQUFPQyxLQUFSLEVBQVY7QUFBQSxDQUFSLEVBQW1DLGdCQUFNQyxXQUFOLENBQWtCO0FBQUE7O0FBQy9EQyxhQUFXO0FBQ1RILFdBQU8sZ0JBQU1JLFNBQU4sQ0FBZ0JDLE1BQWhCLENBQXVCQyxVQURyQjtBQUVUQyxjQUFVLGdCQUFNSCxTQUFOLENBQWdCSSxJQUFoQixDQUFxQkY7QUFGdEIsR0FEb0Q7QUFLL0RHLFFBTCtELG9CQUt0RDtBQUFBLGlCQUNxQixLQUFLQyxLQUQxQjtBQUFBLFFBQ0NWLEtBREQsVUFDQ0EsS0FERDtBQUFBLFFBQ1FPLFFBRFIsVUFDUUEsUUFEUjs7QUFFUCxXQUNFO0FBQUE7QUFBQTtBQUNFO0FBQUE7QUFBQTtBQUFBO0FBQUEsT0FERjtBQUVFLGdFQUZGO0FBR0UsNERBSEY7QUFJRTtBQUFBO0FBQUE7QUFDRTtBQUFBO0FBQUEsWUFBRyxNQUFLLFNBQVI7QUFBQTtBQUFBO0FBREY7QUFKRixLQURGO0FBVUQ7QUFqQjhELENBQWxCLENBQW5DLENBQVo7O2tCQW9CZVIsRyIsImZpbGUiOiJBcHAuanMiLCJzb3VyY2VSb290IjoiL2FwcC9jbGllbnQvY29tcG9uZW50cyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5pbXBvcnQgc3R5bGVzIGZyb20gJy4vQXBwLmNzcyc7XG5pbXBvcnQgeyBjb25uZWN0IH0gZnJvbSAncmVhY3QtcmVkdXgnO1xuaW1wb3J0IENvdW50QnV0dG9uIGZyb20gJy4vQ291bnRCdXR0b24nXG5pbXBvcnQgQ29uc29sZSBmcm9tICcuL0NvbnNvbGUnXG5jb25zdCBBcHAgPSBjb25uZWN0KHN0YXRlID0+ICh7Y291bnQ6IHN0YXRlfSkpKFJlYWN0LmNyZWF0ZUNsYXNzKHtcbiAgcHJvcFR5cGVzOiB7XG4gICAgY291bnQ6IFJlYWN0LlByb3BUeXBlcy5vYmplY3QuaXNSZXF1aXJlZCxcbiAgICBkaXNwYXRjaDogUmVhY3QuUHJvcFR5cGVzLmZ1bmMuaXNSZXF1aXJlZFxuICB9LFxuICByZW5kZXIoKSB7XG4gICAgY29uc3QgeyBjb3VudCwgZGlzcGF0Y2ggfSA9IHRoaXMucHJvcHM7XG4gICAgcmV0dXJuIChcbiAgICAgIDxkaXY+XG4gICAgICAgIDxoMT5EZW1vbnN0cmF0aW9uczwvaDE+XG4gICAgICAgIDxDb3VudEJ1dHRvbiAvPlxuICAgICAgICA8Q29uc29sZSAvPlxuICAgICAgICA8cD5cbiAgICAgICAgICA8YSBocmVmPVwiL3dob2FtaVwiPlNlcnZlci1vbmx5IHJvdXRlPC9hPlxuICAgICAgICA8L3A+XG4gICAgICA8L2Rpdj5cbiAgICApO1xuICB9LFxufSkpO1xuXG5leHBvcnQgZGVmYXVsdCBBcHA7XG4iXX0=",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "App.js"
+      ],
+      "names": [
+        "App",
+        "count",
+        "state",
+        "createClass",
+        "propTypes",
+        "PropTypes",
+        "object",
+        "isRequired",
+        "dispatch",
+        "func",
+        "render",
+        "props"
+      ],
+      "mappings": ";;;;;;AAAA;;;;AACA;;;;AACA;;AACA;;;;AACA;;;;;;AACA,IAAMA,MAAM,yBAAQ;AAAA,SAAU,EAACC,OAAOC,KAAR,EAAV;AAAA,CAAR,EAAmC,gBAAMC,WAAN,CAAkB;AAAA;;AAC/DC,aAAW;AACTH,WAAO,gBAAMI,SAAN,CAAgBC,MAAhB,CAAuBC,UADrB;AAETC,cAAU,gBAAMH,SAAN,CAAgBI,IAAhB,CAAqBF;AAFtB,GADoD;AAK/DG,QAL+D,oBAKtD;AAAA,iBACqB,KAAKC,KAD1B;AAAA,QACCV,KADD,UACCA,KADD;AAAA,QACQO,QADR,UACQA,QADR;;AAEP,WACE;AAAA;AAAA;AACE;AAAA;AAAA;AAAA;AAAA,OADF;AAEE,gEAFF;AAGE,4DAHF;AAIE;AAAA;AAAA;AACE;AAAA;AAAA,YAAG,MAAK,SAAR;AAAA;AAAA;AADF;AAJF,KADF;AAUD;AAjB8D,CAAlB,CAAnC,CAAZ;;kBAoBeR,G",
+      "file": "App.js",
+      "sourceRoot": "/app/client/components",
+      "sourcesContent": [
+        "import React from 'react';\nimport styles from './App.css';\nimport { connect } from 'react-redux';\nimport CountButton from './CountButton'\nimport Console from './Console'\nconst App = connect(state => ({count: state}))(React.createClass({\n  propTypes: {\n    count: React.PropTypes.object.isRequired,\n    dispatch: React.PropTypes.func.isRequired\n  },\n  render() {\n    const { count, dispatch } = this.props;\n    return (\n      <div>\n        <h1>Demonstrations</h1>\n        <CountButton />\n        <Console />\n        <p>\n          <a href=\"/whoami\">Server-only route</a>\n        </p>\n      </div>\n    );\n  },\n}));\n\nexport default App;\n"
+      ]
+    },
+    "mtime": 1525229528677
+  },
+  "{\"filename\":\"/app/client/components/CountButton.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/client/components\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "react",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "React"
+              }
+            ]
+          },
+          {
+            "source": "./App.css",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "styles"
+              }
+            ]
+          },
+          {
+            "source": "react-redux",
+            "imported": [
+              "connect"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "connect",
+                "local": "connect"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/client/components/CountButton.js",
+      "filenameRelative": "/app/client/components/CountButton.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "CountButton.js",
+      "sourceFileName": "CountButton.js",
+      "sourceRoot": "/app/client/components",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app/client/components",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "CountButton"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _react = require('react');\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _App = require('./App.css');\n\nvar _App2 = _interopRequireDefault(_App);\n\nvar _reactRedux = require('react-redux');\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar CountButton = (0, _reactRedux.connect)(function (state) {\n  return { count: state };\n})(_react2.default.createClass({\n  displayName: 'CountButton',\n\n  propTypes: {\n    count: _react2.default.PropTypes.object.isRequired,\n    dispatch: _react2.default.PropTypes.func.isRequired\n  },\n  render: function render() {\n    var _props = this.props,\n        count = _props.count,\n        dispatch = _props.dispatch;\n\n    return _react2.default.createElement(\n      'div',\n      null,\n      _react2.default.createElement(\n        'button',\n        {\n          className: _App2.default.increment,\n          onClick: function onClick() {\n            return dispatch({ type: \"INC\" });\n          }\n        },\n        count.num\n      )\n    );\n  }\n}));\n\nexports.default = CountButton;\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkNvdW50QnV0dG9uLmpzIl0sIm5hbWVzIjpbIkNvdW50QnV0dG9uIiwiY291bnQiLCJzdGF0ZSIsImNyZWF0ZUNsYXNzIiwicHJvcFR5cGVzIiwiUHJvcFR5cGVzIiwib2JqZWN0IiwiaXNSZXF1aXJlZCIsImRpc3BhdGNoIiwiZnVuYyIsInJlbmRlciIsInByb3BzIiwiaW5jcmVtZW50IiwidHlwZSIsIm51bSJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUE7Ozs7QUFDQTs7OztBQUNBOzs7O0FBRUEsSUFBTUEsY0FBYyx5QkFBUTtBQUFBLFNBQVUsRUFBQ0MsT0FBT0MsS0FBUixFQUFWO0FBQUEsQ0FBUixFQUFtQyxnQkFBTUMsV0FBTixDQUFrQjtBQUFBOztBQUN2RUMsYUFBVztBQUNUSCxXQUFPLGdCQUFNSSxTQUFOLENBQWdCQyxNQUFoQixDQUF1QkMsVUFEckI7QUFFVEMsY0FBVSxnQkFBTUgsU0FBTixDQUFnQkksSUFBaEIsQ0FBcUJGO0FBRnRCLEdBRDREO0FBS3ZFRyxRQUx1RSxvQkFLOUQ7QUFBQSxpQkFDcUIsS0FBS0MsS0FEMUI7QUFBQSxRQUNDVixLQURELFVBQ0NBLEtBREQ7QUFBQSxRQUNRTyxRQURSLFVBQ1FBLFFBRFI7O0FBRVAsV0FDQTtBQUFBO0FBQUE7QUFFSTtBQUFBO0FBQUE7QUFDRSxxQkFBVyxjQUFPSSxTQURwQjtBQUVFLG1CQUFTO0FBQUEsbUJBQU1KLFNBQVMsRUFBQ0ssTUFBTSxLQUFQLEVBQVQsQ0FBTjtBQUFBO0FBRlg7QUFJTFosY0FBTWE7QUFKRDtBQUZKLEtBREE7QUFXRDtBQWxCc0UsQ0FBbEIsQ0FBbkMsQ0FBcEI7O2tCQXFCZWQsVyIsImZpbGUiOiJDb3VudEJ1dHRvbi5qcyIsInNvdXJjZVJvb3QiOiIvYXBwL2NsaWVudC9jb21wb25lbnRzIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0IGZyb20gJ3JlYWN0JztcbmltcG9ydCBzdHlsZXMgZnJvbSAnLi9BcHAuY3NzJztcbmltcG9ydCB7IGNvbm5lY3QgfSBmcm9tICdyZWFjdC1yZWR1eCc7XG5cbmNvbnN0IENvdW50QnV0dG9uID0gY29ubmVjdChzdGF0ZSA9PiAoe2NvdW50OiBzdGF0ZX0pKShSZWFjdC5jcmVhdGVDbGFzcyh7XG4gIHByb3BUeXBlczoge1xuICAgIGNvdW50OiBSZWFjdC5Qcm9wVHlwZXMub2JqZWN0LmlzUmVxdWlyZWQsXG4gICAgZGlzcGF0Y2g6IFJlYWN0LlByb3BUeXBlcy5mdW5jLmlzUmVxdWlyZWRcbiAgfSxcbiAgcmVuZGVyKCkge1xuICAgIGNvbnN0IHsgY291bnQsIGRpc3BhdGNoIH0gPSB0aGlzLnByb3BzO1xuICAgIHJldHVybiAoXG4gICAgPGRpdj5cblxuICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgY2xhc3NOYW1lPXtzdHlsZXMuaW5jcmVtZW50fVxuICAgICAgICAgIG9uQ2xpY2s9eygpID0+IGRpc3BhdGNoKHt0eXBlOiBcIklOQ1wifSl9XG4gICAgICAgID5cbiAge2NvdW50Lm51bX1cbiAgICAgICAgPC9idXR0b24+XG4gIDwvZGl2PlxuICApXG4gIH1cbn0pKTtcblxuZXhwb3J0IGRlZmF1bHQgQ291bnRCdXR0b247Il19",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "CountButton.js"
+      ],
+      "names": [
+        "CountButton",
+        "count",
+        "state",
+        "createClass",
+        "propTypes",
+        "PropTypes",
+        "object",
+        "isRequired",
+        "dispatch",
+        "func",
+        "render",
+        "props",
+        "increment",
+        "type",
+        "num"
+      ],
+      "mappings": ";;;;;;AAAA;;;;AACA;;;;AACA;;;;AAEA,IAAMA,cAAc,yBAAQ;AAAA,SAAU,EAACC,OAAOC,KAAR,EAAV;AAAA,CAAR,EAAmC,gBAAMC,WAAN,CAAkB;AAAA;;AACvEC,aAAW;AACTH,WAAO,gBAAMI,SAAN,CAAgBC,MAAhB,CAAuBC,UADrB;AAETC,cAAU,gBAAMH,SAAN,CAAgBI,IAAhB,CAAqBF;AAFtB,GAD4D;AAKvEG,QALuE,oBAK9D;AAAA,iBACqB,KAAKC,KAD1B;AAAA,QACCV,KADD,UACCA,KADD;AAAA,QACQO,QADR,UACQA,QADR;;AAEP,WACA;AAAA;AAAA;AAEI;AAAA;AAAA;AACE,qBAAW,cAAOI,SADpB;AAEE,mBAAS;AAAA,mBAAMJ,SAAS,EAACK,MAAM,KAAP,EAAT,CAAN;AAAA;AAFX;AAILZ,cAAMa;AAJD;AAFJ,KADA;AAWD;AAlBsE,CAAlB,CAAnC,CAApB;;kBAqBed,W",
+      "file": "CountButton.js",
+      "sourceRoot": "/app/client/components",
+      "sourcesContent": [
+        "import React from 'react';\nimport styles from './App.css';\nimport { connect } from 'react-redux';\n\nconst CountButton = connect(state => ({count: state}))(React.createClass({\n  propTypes: {\n    count: React.PropTypes.object.isRequired,\n    dispatch: React.PropTypes.func.isRequired\n  },\n  render() {\n    const { count, dispatch } = this.props;\n    return (\n    <div>\n\n        <button\n          className={styles.increment}\n          onClick={() => dispatch({type: \"INC\"})}\n        >\n  {count.num}\n        </button>\n  </div>\n  )\n  }\n}));\n\nexport default CountButton;"
+      ]
+    },
+    "mtime": 1525228996856
+  },
+  "{\"filename\":\"/app/client/store.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/client\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
+    "metadata": {
+      "usedHelpers": [],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "redux",
+            "imported": [
+              "createStore"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "createStore",
+                "local": "createStore"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/client/store.js",
+      "filenameRelative": "/app/client/store.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "store.js",
+      "sourceFileName": "store.js",
+      "sourceRoot": "/app/client",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app/client",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "store"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _redux = require('redux');\n\nvar configureStore = function configureStore(initialState) {\n  var store = (0, _redux.createStore)(require('./reducers'), initialState);\n\n  if (module.hot) {\n    // Enable Webpack hot module replacement for reducers\n    module.hot.accept('./reducers', function () {\n      var nextRootReducer = require('./reducers');\n\n      store.replaceReducer(nextRootReducer);\n    });\n  }\n\n  return store;\n};\n\nexports.default = configureStore;\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInN0b3JlLmpzIl0sIm5hbWVzIjpbImNvbmZpZ3VyZVN0b3JlIiwiaW5pdGlhbFN0YXRlIiwic3RvcmUiLCJyZXF1aXJlIiwibW9kdWxlIiwiaG90IiwiYWNjZXB0IiwibmV4dFJvb3RSZWR1Y2VyIiwicmVwbGFjZVJlZHVjZXIiXSwibWFwcGluZ3MiOiI7Ozs7OztBQUFBOztBQUVBLElBQU1BLGlCQUFpQixTQUFqQkEsY0FBaUIsQ0FBQ0MsWUFBRCxFQUFrQjtBQUN2QyxNQUFNQyxRQUFRLHdCQUFZQyxRQUFRLFlBQVIsQ0FBWixFQUFtQ0YsWUFBbkMsQ0FBZDs7QUFFQSxNQUFJRyxPQUFPQyxHQUFYLEVBQWdCO0FBQ2Q7QUFDQUQsV0FBT0MsR0FBUCxDQUFXQyxNQUFYLENBQWtCLFlBQWxCLEVBQWdDLFlBQU07QUFDcEMsVUFBTUMsa0JBQWtCSixRQUFRLFlBQVIsQ0FBeEI7O0FBRUFELFlBQU1NLGNBQU4sQ0FBcUJELGVBQXJCO0FBQ0QsS0FKRDtBQUtEOztBQUVELFNBQU9MLEtBQVA7QUFDRCxDQWJEOztrQkFlZUYsYyIsImZpbGUiOiJzdG9yZS5qcyIsInNvdXJjZVJvb3QiOiIvYXBwL2NsaWVudCIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGNyZWF0ZVN0b3JlIH0gZnJvbSAncmVkdXgnO1xuXG5jb25zdCBjb25maWd1cmVTdG9yZSA9IChpbml0aWFsU3RhdGUpID0+IHtcbiAgY29uc3Qgc3RvcmUgPSBjcmVhdGVTdG9yZShyZXF1aXJlKCcuL3JlZHVjZXJzJyksIGluaXRpYWxTdGF0ZSk7XG5cbiAgaWYgKG1vZHVsZS5ob3QpIHtcbiAgICAvLyBFbmFibGUgV2VicGFjayBob3QgbW9kdWxlIHJlcGxhY2VtZW50IGZvciByZWR1Y2Vyc1xuICAgIG1vZHVsZS5ob3QuYWNjZXB0KCcuL3JlZHVjZXJzJywgKCkgPT4ge1xuICAgICAgY29uc3QgbmV4dFJvb3RSZWR1Y2VyID0gcmVxdWlyZSgnLi9yZWR1Y2VycycpO1xuXG4gICAgICBzdG9yZS5yZXBsYWNlUmVkdWNlcihuZXh0Um9vdFJlZHVjZXIpO1xuICAgIH0pO1xuICB9XG5cbiAgcmV0dXJuIHN0b3JlO1xufTtcblxuZXhwb3J0IGRlZmF1bHQgY29uZmlndXJlU3RvcmU7XG4iXX0=",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "store.js"
+      ],
+      "names": [
+        "configureStore",
+        "initialState",
+        "store",
+        "require",
+        "module",
+        "hot",
+        "accept",
+        "nextRootReducer",
+        "replaceReducer"
+      ],
+      "mappings": ";;;;;;AAAA;;AAEA,IAAMA,iBAAiB,SAAjBA,cAAiB,CAACC,YAAD,EAAkB;AACvC,MAAMC,QAAQ,wBAAYC,QAAQ,YAAR,CAAZ,EAAmCF,YAAnC,CAAd;;AAEA,MAAIG,OAAOC,GAAX,EAAgB;AACd;AACAD,WAAOC,GAAP,CAAWC,MAAX,CAAkB,YAAlB,EAAgC,YAAM;AACpC,UAAMC,kBAAkBJ,QAAQ,YAAR,CAAxB;;AAEAD,YAAMM,cAAN,CAAqBD,eAArB;AACD,KAJD;AAKD;;AAED,SAAOL,KAAP;AACD,CAbD;;kBAeeF,c",
+      "file": "store.js",
+      "sourceRoot": "/app/client",
+      "sourcesContent": [
+        "import { createStore } from 'redux';\n\nconst configureStore = (initialState) => {\n  const store = createStore(require('./reducers'), initialState);\n\n  if (module.hot) {\n    // Enable Webpack hot module replacement for reducers\n    module.hot.accept('./reducers', () => {\n      const nextRootReducer = require('./reducers');\n\n      store.replaceReducer(nextRootReducer);\n    });\n  }\n\n  return store;\n};\n\nexport default configureStore;\n"
+      ]
+    },
+    "mtime": 1520333640000
+  },
+  "{\"filename\":\"/app/client/reducers/index.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/client/reducers\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
+    "metadata": {
+      "usedHelpers": [],
+      "marked": [],
+      "modules": {
+        "imports": [],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/client/reducers/index.js",
+      "filenameRelative": "/app/client/reducers/index.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "index.js",
+      "sourceFileName": "index.js",
+      "sourceRoot": "/app/client/reducers",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app/client/reducers",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "index"
+    },
+    "ignored": false,
+    "code": "\"use strict\";\n\nvar initial = {\n  num: 5\n};\nvar handlers = {\n  INC: function INC(s) {\n    return {\n      num: s.num + 1\n    };\n  }\n};\nfunction reducer() {\n  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initial;\n  var action = arguments[1];\n\n  if (handlers[action.type]) {\n    return handlers[action.type](state);\n  }\n\n  return state;\n}\n\nmodule.exports = reducer;\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImluZGV4LmpzIl0sIm5hbWVzIjpbImluaXRpYWwiLCJudW0iLCJoYW5kbGVycyIsIklOQyIsInMiLCJyZWR1Y2VyIiwic3RhdGUiLCJhY3Rpb24iLCJ0eXBlIiwibW9kdWxlIiwiZXhwb3J0cyJdLCJtYXBwaW5ncyI6Ijs7QUFBQSxJQUFNQSxVQUFVO0FBQ2RDLE9BQUs7QUFEUyxDQUFoQjtBQUdBLElBQU1DLFdBQVc7QUFDZkMsS0FEZSxlQUNYQyxDQURXLEVBQ1I7QUFDTCxXQUFPO0FBQ0xILFdBQUtHLEVBQUVILEdBQUYsR0FBUTtBQURSLEtBQVA7QUFHRDtBQUxjLENBQWpCO0FBT0EsU0FBU0ksT0FBVCxHQUEwQztBQUFBLE1BQXpCQyxLQUF5Qix1RUFBakJOLE9BQWlCO0FBQUEsTUFBUk8sTUFBUTs7QUFDeEMsTUFBSUwsU0FBU0ssT0FBT0MsSUFBaEIsQ0FBSixFQUEyQjtBQUN6QixXQUFPTixTQUFTSyxPQUFPQyxJQUFoQixFQUFzQkYsS0FBdEIsQ0FBUDtBQUNEOztBQUVELFNBQU9BLEtBQVA7QUFDRDs7QUFFREcsT0FBT0MsT0FBUCxHQUFpQkwsT0FBakIiLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiL2FwcC9jbGllbnQvcmVkdWNlcnMiLCJzb3VyY2VzQ29udGVudCI6WyJjb25zdCBpbml0aWFsID0ge1xuICBudW06IDUsXG59O1xuY29uc3QgaGFuZGxlcnMgPSB7XG4gIElOQyhzKSB7XG4gICAgcmV0dXJuIHtcbiAgICAgIG51bTogcy5udW0gKyAxXG4gICAgfTtcbiAgfVxufTtcbmZ1bmN0aW9uIHJlZHVjZXIoc3RhdGUgPSBpbml0aWFsLCBhY3Rpb24pIHtcbiAgaWYgKGhhbmRsZXJzW2FjdGlvbi50eXBlXSkge1xuICAgIHJldHVybiBoYW5kbGVyc1thY3Rpb24udHlwZV0oc3RhdGUpO1xuICB9XG5cbiAgcmV0dXJuIHN0YXRlO1xufVxuXG5tb2R1bGUuZXhwb3J0cyA9IHJlZHVjZXI7XG4iXX0=",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "index.js"
+      ],
+      "names": [
+        "initial",
+        "num",
+        "handlers",
+        "INC",
+        "s",
+        "reducer",
+        "state",
+        "action",
+        "type",
+        "module",
+        "exports"
+      ],
+      "mappings": ";;AAAA,IAAMA,UAAU;AACdC,OAAK;AADS,CAAhB;AAGA,IAAMC,WAAW;AACfC,KADe,eACXC,CADW,EACR;AACL,WAAO;AACLH,WAAKG,EAAEH,GAAF,GAAQ;AADR,KAAP;AAGD;AALc,CAAjB;AAOA,SAASI,OAAT,GAA0C;AAAA,MAAzBC,KAAyB,uEAAjBN,OAAiB;AAAA,MAARO,MAAQ;;AACxC,MAAIL,SAASK,OAAOC,IAAhB,CAAJ,EAA2B;AACzB,WAAON,SAASK,OAAOC,IAAhB,EAAsBF,KAAtB,CAAP;AACD;;AAED,SAAOA,KAAP;AACD;;AAEDG,OAAOC,OAAP,GAAiBL,OAAjB",
+      "file": "index.js",
+      "sourceRoot": "/app/client/reducers",
+      "sourcesContent": [
+        "const initial = {\n  num: 5,\n};\nconst handlers = {\n  INC(s) {\n    return {\n      num: s.num + 1\n    };\n  }\n};\nfunction reducer(state = initial, action) {\n  if (handlers[action.type]) {\n    return handlers[action.type](state);\n  }\n\n  return state;\n}\n\nmodule.exports = reducer;\n"
+      ]
+    },
+    "mtime": 1525229486654
+  },
+  "{\"filename\":\"/app/client/components/Console.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/client/components\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
+    "metadata": {
+      "usedHelpers": [
+        "inherits",
+        "possibleConstructorReturn",
+        "createClass",
+        "classCallCheck",
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "react",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "React"
+              }
+            ]
+          },
+          {
+            "source": "react-dom",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "ReactDOM"
+              }
+            ]
+          },
+          {
+            "source": "./App.css",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "styles"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/client/components/Console.js",
+      "filenameRelative": "/app/client/components/Console.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "Console.js",
+      "sourceFileName": "Console.js",
+      "sourceRoot": "/app/client/components",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app/client/components",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "Console"
+    },
+    "ignored": false,
+    "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _promise = require(\"babel-runtime/core-js/promise\");\n\nvar _promise2 = _interopRequireDefault(_promise);\n\nvar _getPrototypeOf = require(\"babel-runtime/core-js/object/get-prototype-of\");\n\nvar _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);\n\nvar _classCallCheck2 = require(\"babel-runtime/helpers/classCallCheck\");\n\nvar _classCallCheck3 = _interopRequireDefault(_classCallCheck2);\n\nvar _createClass2 = require(\"babel-runtime/helpers/createClass\");\n\nvar _createClass3 = _interopRequireDefault(_createClass2);\n\nvar _possibleConstructorReturn2 = require(\"babel-runtime/helpers/possibleConstructorReturn\");\n\nvar _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);\n\nvar _inherits2 = require(\"babel-runtime/helpers/inherits\");\n\nvar _inherits3 = _interopRequireDefault(_inherits2);\n\nvar _react = require(\"react\");\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _reactDom = require(\"react-dom\");\n\nvar _reactDom2 = _interopRequireDefault(_reactDom);\n\nvar _App = require(\"./App.css\");\n\nvar _App2 = _interopRequireDefault(_App);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar Console = function (_React$Component) {\n  (0, _inherits3.default)(Console, _React$Component);\n\n  function Console(props) {\n    (0, _classCallCheck3.default)(this, Console);\n\n    var _this = (0, _possibleConstructorReturn3.default)(this, (Console.__proto__ || (0, _getPrototypeOf2.default)(Console)).call(this, props));\n\n    _this.state = { contents: [] };\n    setInterval(_this.fetch.bind(_this), 2000);\n    return _this;\n  }\n\n  (0, _createClass3.default)(Console, [{\n    key: \"fetch\",\n    value: function (_fetch) {\n      function fetch() {\n        return _fetch.apply(this, arguments);\n      }\n\n      fetch.toString = function () {\n        return _fetch.toString();\n      };\n\n      return fetch;\n    }(function () {\n      if (window) return;\n      console.log(\"fetch\");\n      var wait = function wait(ms) {\n        return new _promise2.default(function (resolve) {\n          return setTimeout(resolve, ms);\n        });\n      };\n\n      wait(2000).then(function () {\n        return console.log(\"waited\");\n      });\n      fetch(location.origin + '/console/list').then(function (response) {\n        return response.json();\n      }).then(function (myJson) {\n        this.setState({ contents: myJson });\n      });\n    })\n  }, {\n    key: \"clear\",\n    value: function clear() {\n      console.log(\"cleared\");\n      fetch(location.origin + '/console/clear').then(function (response) {\n        return response.json();\n      }).then(function (myJson) {\n        this.setState({ contents: myJson });\n      });\n    }\n  }, {\n    key: \"render\",\n    value: function render() {\n      var _this2 = this;\n\n      var contents = this.state.contents;\n      console.log(\"render contents\", contents);\n      return _react2.default.createElement(\n        \"div\",\n        null,\n        _react2.default.createElement(\n          \"button\",\n          {\n            className: _App2.default.increment,\n            onClick: function onClick() {\n              return _this2.clear();\n            }\n          },\n          \"Clear\"\n        ),\n        \"my stuff \",\n        contents\n      );\n    }\n  }]);\n  return Console;\n}(_react2.default.Component);\n\nexports.default = Console;\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkNvbnNvbGUuanMiXSwibmFtZXMiOlsiQ29uc29sZSIsInByb3BzIiwic3RhdGUiLCJjb250ZW50cyIsInNldEludGVydmFsIiwiZmV0Y2giLCJiaW5kIiwid2luZG93IiwiY29uc29sZSIsImxvZyIsIndhaXQiLCJzZXRUaW1lb3V0IiwicmVzb2x2ZSIsIm1zIiwidGhlbiIsImxvY2F0aW9uIiwib3JpZ2luIiwicmVzcG9uc2UiLCJqc29uIiwibXlKc29uIiwic2V0U3RhdGUiLCJpbmNyZW1lbnQiLCJjbGVhciIsIkNvbXBvbmVudCJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUE7Ozs7QUFDQTs7OztBQUNBOzs7Ozs7SUFFTUEsTzs7O0FBQ0osbUJBQVlDLEtBQVosRUFBbUI7QUFBQTs7QUFBQSx3SUFDWEEsS0FEVzs7QUFFakIsVUFBS0MsS0FBTCxHQUFhLEVBQUNDLFVBQVUsRUFBWCxFQUFiO0FBQ0FDLGdCQUFZLE1BQUtDLEtBQUwsQ0FBV0MsSUFBWCxPQUFaLEVBQW1DLElBQW5DO0FBSGlCO0FBSWxCOzs7Ozs7Ozs7Ozs7OztrQkFDTztBQUNOLFVBQUdDLE1BQUgsRUFBVztBQUNYQyxjQUFRQyxHQUFSLENBQVksT0FBWjtBQUNBLFVBQU1DLE9BQU8sU0FBUEEsSUFBTztBQUFBLGVBQU0sc0JBQVk7QUFBQSxpQkFBaUJDLFdBQVdDLE9BQVgsRUFBb0JDLEVBQXBCLENBQWpCO0FBQUEsU0FBWixDQUFOO0FBQUEsT0FBYjs7QUFFQUgsV0FBSyxJQUFMLEVBQVdJLElBQVgsQ0FBZ0I7QUFBQSxlQUFNTixRQUFRQyxHQUFSLENBQVksUUFBWixDQUFOO0FBQUEsT0FBaEI7QUFDQUosWUFBTVUsU0FBU0MsTUFBVCxHQUFrQixlQUF4QixFQUNDRixJQURELENBQ00sVUFBU0csUUFBVCxFQUFtQjtBQUN6QixlQUFPQSxTQUFTQyxJQUFULEVBQVA7QUFDRCxPQUhDLEVBSURKLElBSkMsQ0FJSSxVQUFTSyxNQUFULEVBQWlCO0FBQ3JCLGFBQUtDLFFBQUwsQ0FBYyxFQUFDakIsVUFBVWdCLE1BQVgsRUFBZDtBQUNELE9BTkM7QUFPRCxLOzs7NEJBQ087QUFDTlgsY0FBUUMsR0FBUixDQUFZLFNBQVo7QUFDQUosWUFBTVUsU0FBU0MsTUFBVCxHQUFrQixnQkFBeEIsRUFDQ0YsSUFERCxDQUNNLFVBQVNHLFFBQVQsRUFBbUI7QUFDekIsZUFBT0EsU0FBU0MsSUFBVCxFQUFQO0FBQ0QsT0FIQyxFQUlESixJQUpDLENBSUksVUFBU0ssTUFBVCxFQUFpQjtBQUNyQixhQUFLQyxRQUFMLENBQWMsRUFBQ2pCLFVBQVVnQixNQUFYLEVBQWQ7QUFDRCxPQU5DO0FBT0Q7Ozs2QkFDTztBQUFBOztBQUNOLFVBQUloQixXQUFXLEtBQUtELEtBQUwsQ0FBV0MsUUFBMUI7QUFDQUssY0FBUUMsR0FBUixDQUFZLGlCQUFaLEVBQStCTixRQUEvQjtBQUNBLGFBQU87QUFBQTtBQUFBO0FBQ0w7QUFBQTtBQUFBO0FBQ0ksdUJBQVcsY0FBT2tCLFNBRHRCO0FBRUkscUJBQVM7QUFBQSxxQkFBTSxPQUFLQyxLQUFMLEVBQU47QUFBQTtBQUZiO0FBQUE7QUFBQSxTQURLO0FBQUE7QUFRS25CO0FBUkwsT0FBUDtBQVNEOzs7RUExQ21CLGdCQUFNb0IsUzs7a0JBNkNidkIsTyIsImZpbGUiOiJDb25zb2xlLmpzIiwic291cmNlUm9vdCI6Ii9hcHAvY2xpZW50L2NvbXBvbmVudHMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgUmVhY3QgZnJvbSBcInJlYWN0XCJcbmltcG9ydCBSZWFjdERPTSBmcm9tIFwicmVhY3QtZG9tXCJcbmltcG9ydCBzdHlsZXMgZnJvbSAnLi9BcHAuY3NzJztcblxuY2xhc3MgQ29uc29sZSBleHRlbmRzIFJlYWN0LkNvbXBvbmVudCB7XG4gIGNvbnN0cnVjdG9yKHByb3BzKSB7XG4gICAgc3VwZXIocHJvcHMpO1xuICAgIHRoaXMuc3RhdGUgPSB7Y29udGVudHM6IFtdfTtcbiAgICBzZXRJbnRlcnZhbCh0aGlzLmZldGNoLmJpbmQodGhpcyksIDIwMDApXG4gIH1cbiAgZmV0Y2goKSB7XG4gICAgaWYod2luZG93KSByZXR1cm47XG4gICAgY29uc29sZS5sb2coXCJmZXRjaFwiKVxuICAgIGNvbnN0IHdhaXQgPSBtcyA9PiBuZXcgUHJvbWlzZShyZXNvbHZlID0+ICAgICAgIHNldFRpbWVvdXQocmVzb2x2ZSwgbXMpKTtcblxuICAgIHdhaXQoMjAwMCkudGhlbigoKSA9PiBjb25zb2xlLmxvZyhcIndhaXRlZFwiKSlcbiAgICBmZXRjaChsb2NhdGlvbi5vcmlnaW4gKyAnL2NvbnNvbGUvbGlzdCcpXG4gICAgLnRoZW4oZnVuY3Rpb24ocmVzcG9uc2UpIHtcbiAgICByZXR1cm4gcmVzcG9uc2UuanNvbigpO1xuICB9KVxuICAudGhlbihmdW5jdGlvbihteUpzb24pIHtcbiAgICB0aGlzLnNldFN0YXRlKHtjb250ZW50czogbXlKc29ufSlcbiAgfSk7XG4gIH1cbiAgY2xlYXIoKSB7XG4gICAgY29uc29sZS5sb2coXCJjbGVhcmVkXCIpXG4gICAgZmV0Y2gobG9jYXRpb24ub3JpZ2luICsgJy9jb25zb2xlL2NsZWFyJylcbiAgICAudGhlbihmdW5jdGlvbihyZXNwb25zZSkge1xuICAgIHJldHVybiByZXNwb25zZS5qc29uKCk7XG4gIH0pXG4gIC50aGVuKGZ1bmN0aW9uKG15SnNvbikge1xuICAgIHRoaXMuc2V0U3RhdGUoe2NvbnRlbnRzOiBteUpzb259KVxuICB9KTtcbiAgfVxuICByZW5kZXIoKXtcbiAgICBsZXQgY29udGVudHMgPSB0aGlzLnN0YXRlLmNvbnRlbnRzO1xuICAgIGNvbnNvbGUubG9nKFwicmVuZGVyIGNvbnRlbnRzXCIsIGNvbnRlbnRzKVxuICAgIHJldHVybiA8ZGl2PiBcbiAgICAgIDxidXR0b25cbiAgICAgICAgICBjbGFzc05hbWU9e3N0eWxlcy5pbmNyZW1lbnR9XG4gICAgICAgICAgb25DbGljaz17KCkgPT4gdGhpcy5jbGVhcigpfVxuICAgICAgICA+XG4gIENsZWFyXG4gICAgICAgIDwvYnV0dG9uPlxuICAgICAgXG4gICAgICBteSBzdHVmZiB7Y29udGVudHN9PC9kaXY+XG4gIH1cbn1cblxuZXhwb3J0IGRlZmF1bHQgQ29uc29sZTtcbiJdfQ==",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "Console.js"
+      ],
+      "names": [
+        "Console",
+        "props",
+        "state",
+        "contents",
+        "setInterval",
+        "fetch",
+        "bind",
+        "window",
+        "console",
+        "log",
+        "wait",
+        "setTimeout",
+        "resolve",
+        "ms",
+        "then",
+        "location",
+        "origin",
+        "response",
+        "json",
+        "myJson",
+        "setState",
+        "increment",
+        "clear",
+        "Component"
+      ],
+      "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;;;;AACA;;;;AACA;;;;;;IAEMA,O;;;AACJ,mBAAYC,KAAZ,EAAmB;AAAA;;AAAA,wIACXA,KADW;;AAEjB,UAAKC,KAAL,GAAa,EAACC,UAAU,EAAX,EAAb;AACAC,gBAAY,MAAKC,KAAL,CAAWC,IAAX,OAAZ,EAAmC,IAAnC;AAHiB;AAIlB;;;;;;;;;;;;;;kBACO;AACN,UAAGC,MAAH,EAAW;AACXC,cAAQC,GAAR,CAAY,OAAZ;AACA,UAAMC,OAAO,SAAPA,IAAO;AAAA,eAAM,sBAAY;AAAA,iBAAiBC,WAAWC,OAAX,EAAoBC,EAApB,CAAjB;AAAA,SAAZ,CAAN;AAAA,OAAb;;AAEAH,WAAK,IAAL,EAAWI,IAAX,CAAgB;AAAA,eAAMN,QAAQC,GAAR,CAAY,QAAZ,CAAN;AAAA,OAAhB;AACAJ,YAAMU,SAASC,MAAT,GAAkB,eAAxB,EACCF,IADD,CACM,UAASG,QAAT,EAAmB;AACzB,eAAOA,SAASC,IAAT,EAAP;AACD,OAHC,EAIDJ,IAJC,CAII,UAASK,MAAT,EAAiB;AACrB,aAAKC,QAAL,CAAc,EAACjB,UAAUgB,MAAX,EAAd;AACD,OANC;AAOD,K;;;4BACO;AACNX,cAAQC,GAAR,CAAY,SAAZ;AACAJ,YAAMU,SAASC,MAAT,GAAkB,gBAAxB,EACCF,IADD,CACM,UAASG,QAAT,EAAmB;AACzB,eAAOA,SAASC,IAAT,EAAP;AACD,OAHC,EAIDJ,IAJC,CAII,UAASK,MAAT,EAAiB;AACrB,aAAKC,QAAL,CAAc,EAACjB,UAAUgB,MAAX,EAAd;AACD,OANC;AAOD;;;6BACO;AAAA;;AACN,UAAIhB,WAAW,KAAKD,KAAL,CAAWC,QAA1B;AACAK,cAAQC,GAAR,CAAY,iBAAZ,EAA+BN,QAA/B;AACA,aAAO;AAAA;AAAA;AACL;AAAA;AAAA;AACI,uBAAW,cAAOkB,SADtB;AAEI,qBAAS;AAAA,qBAAM,OAAKC,KAAL,EAAN;AAAA;AAFb;AAAA;AAAA,SADK;AAAA;AAQKnB;AARL,OAAP;AASD;;;EA1CmB,gBAAMoB,S;;kBA6CbvB,O",
+      "file": "Console.js",
+      "sourceRoot": "/app/client/components",
+      "sourcesContent": [
+        "import React from \"react\"\nimport ReactDOM from \"react-dom\"\nimport styles from './App.css';\n\nclass Console extends React.Component {\n  constructor(props) {\n    super(props);\n    this.state = {contents: []};\n    setInterval(this.fetch.bind(this), 2000)\n  }\n  fetch() {\n    if(window) return;\n    console.log(\"fetch\")\n    const wait = ms => new Promise(resolve =>       setTimeout(resolve, ms));\n\n    wait(2000).then(() => console.log(\"waited\"))\n    fetch(location.origin + '/console/list')\n    .then(function(response) {\n    return response.json();\n  })\n  .then(function(myJson) {\n    this.setState({contents: myJson})\n  });\n  }\n  clear() {\n    console.log(\"cleared\")\n    fetch(location.origin + '/console/clear')\n    .then(function(response) {\n    return response.json();\n  })\n  .then(function(myJson) {\n    this.setState({contents: myJson})\n  });\n  }\n  render(){\n    let contents = this.state.contents;\n    console.log(\"render contents\", contents)\n    return <div> \n      <button\n          className={styles.increment}\n          onClick={() => this.clear()}\n        >\n  Clear\n        </button>\n      \n      my stuff {contents}</div>\n  }\n}\n\nexport default Console;\n"
+      ]
+    },
+    "mtime": 1525230156402
   }
 }
