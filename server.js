@@ -25,7 +25,6 @@ let consoleContents = []
 
 
 
-
 app.get("/console/:op", function (request, response) {
   console.log(request.params.op)
   if(request.params.op==='clear'){
@@ -35,7 +34,7 @@ app.get("/console/:op", function (request, response) {
 });
 // Anything else gets passed to the client app's server rendering
 app.get('*', function(req, res, next) {
-  require('./client/server-render')(req.path, function(err, page) {
+  require('./server/server-render')(req.path, function(err, page) {
     if (err) return next(err);
     res.send(page);
   });

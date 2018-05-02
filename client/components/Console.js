@@ -1,7 +1,8 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import styles from './App.css';
-
+import StyledButton from './StyledButton'
+let BlueButton = StyledButton("blue")
 class Console extends React.Component {
   constructor(props) {
     super(props);
@@ -35,15 +36,15 @@ class Console extends React.Component {
   });
   }
   render(){
+    console.log("RENDER CONSOLE")
     let contents = this.state.contents;
     console.log("render contents", contents)
     return <div> 
-      <button
-          className={styles.increment}
+      <BlueButton
           onClick={() => this.clear()}
         >
-  Clear
-        </button>
+        Clear It
+        </BlueButton>
       
       my stuff {contents}</div>
   }

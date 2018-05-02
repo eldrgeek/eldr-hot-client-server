@@ -915,7 +915,7 @@
         "import chokidar from 'chokidar';\nimport config from './webpack.config';\nimport cssModulesRequireHook from 'css-modules-require-hook';\nimport express from 'express';\nimport http from 'http';\nimport webpack from 'webpack';\nimport webpackDevMiddleware from 'webpack-dev-middleware';\nimport webpackHotMiddleware from 'webpack-hot-middleware';\n\ncssModulesRequireHook({generateScopedName: '[path][name]-[local]'});\nconst compiler = webpack(config);\nconst app = express();\n\n// Serve hot-reloading bundle to client\napp.use(webpackDevMiddleware(compiler, {\n  noInfo: true, publicPath: config.output.publicPath\n}));\napp.use(webpackHotMiddleware(compiler));\n\n// Include server routes as a middleware\napp.use(function(req, res, next) {\n  require('./server/app')(req, res, next);\n});\nlet consoleContents = []\n\n\n\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op)\n  if(request.params.op==='clear'){\n    consoleContents = []\n  }\n  response.send(consoleContents); \n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function(req, res, next) {\n  require('./client/server-render')(req.path, function(err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nconst watcher = chokidar.watch('./server');\n\nwatcher.on('ready', function() {\n  watcher.on('all', function() {\n    console.log(\"Clearing /server/ module cache from server\");\n    Object.keys(require.cache).forEach(function(id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function() {\n  console.log(\"Clearing /client/ module cache from server\");\n  Object.keys(require.cache).forEach(function(id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nconst server = http.createServer(app);\nserver.listen(3000, 'localhost', function(err) {\n  if (err) throw err;\n\n  const addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nlet tickNo = 0\nlet bindConsole = () => {\n  let oldLog = console.log.bind(console)\n  oldLog('this')\n\n  let newLog = (...args) => {\n    oldLog(...args);\n    oldLog(\"from newlog\")\n    if (consoleContents.length < 10)\n      consoleContents.push(JSON.stringify(args))\n    //oldLog(consoleContents)\n  }\n\n  newLog('thihs','and that') \n  console.log = newLog\n}\nbindConsole()\nconsole.log(\"After bind\");  "
       ]
     },
-    "mtime": 1525230677071
+    "mtime": 1525267799730
   },
   "{\"filename\":\"/app/webpack.config.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0": {
     "metadata": {
@@ -1172,7 +1172,7 @@
         "import webpack from 'webpack';\nimport path from 'path';\nimport qs from 'querystring';\n\nprocess.env.NODE_ENV = process.env.NODE_ENV || \"development\";\n\nexport default {\n  devtool: '#eval-source-map',\n  entry: [\n    'webpack-hot-middleware/client',\n    './client/app.js'\n  ],\n  output: {\n    path: __dirname,\n    filename: 'bundle.js',\n    publicPath: '/'\n  },\n  plugins: [\n    new webpack.optimize.OccurenceOrderPlugin(),\n    new webpack.HotModuleReplacementPlugin(),\n    new webpack.NoErrorsPlugin()\n  ],\n  resolve: {\n    extensions: ['', '.js'],\n    alias: {\n      request: 'browser-request'\n    }\n  },\n  module: {\n    loaders: [\n      // Javascript\n      {\n        test: /\\.js$/,\n        loader: 'babel',\n        include: path.join(__dirname, 'client'),\n        query: {\n          \"env\": {\n            \"development\": {\n              \"presets\": [\"react-hmre\"],\n              \"plugins\": [\n                [\"react-transform\", {\n                  \"transforms\": [{\n                    \"transform\": \"react-transform-hmr\",\n                    \"imports\": [\"react\"],\n                    \"locals\": [\"module\"]\n                  }]\n                }]\n              ]\n            }\n          },\n        }\n      },\n\n      // CSS\n      {\n        test: /\\.css$/,\n        include: path.join(__dirname, 'client'),\n        loader: 'style-loader!css-loader?' + qs.stringify({\n          modules: true,\n          importLoaders: 1,\n          localIdentName: '[path][name]-[local]'\n        })\n      }\n\n    ]\n  }\n};\n"
       ]
     },
-    "mtime": 1520333640000
+    "mtime": 1525271083886
   },
   "{\"filename\":\"/app/server/app.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app/server\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0:development": {
     "metadata": {
@@ -2830,5 +2830,1560 @@
       ]
     },
     "mtime": 1525230156402
+  },
+  "{\"filename\":\"/app/server.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],{\"ssr\":true}],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "chokidar",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "chokidar"
+              }
+            ]
+          },
+          {
+            "source": "./webpack.config",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "config"
+              }
+            ]
+          },
+          {
+            "source": "css-modules-require-hook",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "cssModulesRequireHook"
+              }
+            ]
+          },
+          {
+            "source": "express",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "express"
+              }
+            ]
+          },
+          {
+            "source": "http",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "http"
+              }
+            ]
+          },
+          {
+            "source": "webpack",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpack"
+              }
+            ]
+          },
+          {
+            "source": "webpack-dev-middleware",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpackDevMiddleware"
+              }
+            ]
+          },
+          {
+            "source": "webpack-hot-middleware",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpackHotMiddleware"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/server.js",
+      "filenameRelative": "/app/server.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "ssr": true
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "server.js",
+      "sourceFileName": "server.js",
+      "sourceRoot": "/app",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "server"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nvar _stringify = require('babel-runtime/core-js/json/stringify');\n\nvar _stringify2 = _interopRequireDefault(_stringify);\n\nvar _keys = require('babel-runtime/core-js/object/keys');\n\nvar _keys2 = _interopRequireDefault(_keys);\n\nvar _chokidar = require('chokidar');\n\nvar _chokidar2 = _interopRequireDefault(_chokidar);\n\nvar _webpack = require('./webpack.config');\n\nvar _webpack2 = _interopRequireDefault(_webpack);\n\nvar _cssModulesRequireHook = require('css-modules-require-hook');\n\nvar _cssModulesRequireHook2 = _interopRequireDefault(_cssModulesRequireHook);\n\nvar _express = require('express');\n\nvar _express2 = _interopRequireDefault(_express);\n\nvar _http = require('http');\n\nvar _http2 = _interopRequireDefault(_http);\n\nvar _webpack3 = require('webpack');\n\nvar _webpack4 = _interopRequireDefault(_webpack3);\n\nvar _webpackDevMiddleware = require('webpack-dev-middleware');\n\nvar _webpackDevMiddleware2 = _interopRequireDefault(_webpackDevMiddleware);\n\nvar _webpackHotMiddleware = require('webpack-hot-middleware');\n\nvar _webpackHotMiddleware2 = _interopRequireDefault(_webpackHotMiddleware);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n(0, _cssModulesRequireHook2.default)({ generateScopedName: '[path][name]-[local]' });\nvar compiler = (0, _webpack4.default)(_webpack2.default);\nvar app = (0, _express2.default)();\n\n// Serve hot-reloading bundle to client\napp.use((0, _webpackDevMiddleware2.default)(compiler, {\n  noInfo: true, publicPath: _webpack2.default.output.publicPath\n}));\napp.use((0, _webpackHotMiddleware2.default)(compiler));\n\n// Include server routes as a middleware\napp.use(function (req, res, next) {\n  require('./server/app')(req, res, next);\n});\nvar consoleContents = [];\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op);\n  if (request.params.op === 'clear') {\n    consoleContents = [];\n  }\n  response.send(consoleContents);\n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function (req, res, next) {\n  require('./client/server-render')(req.path, function (err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nvar watcher = _chokidar2.default.watch('./server');\n\nwatcher.on('ready', function () {\n  watcher.on('all', function () {\n    console.log(\"Clearing /server/ module cache from server\");\n    (0, _keys2.default)(require.cache).forEach(function (id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function () {\n  console.log(\"Clearing /client/ module cache from server\");\n  (0, _keys2.default)(require.cache).forEach(function (id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nvar server = _http2.default.createServer(app);\nserver.listen(3000, 'localhost', function (err) {\n  if (err) throw err;\n\n  var addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nvar tickNo = 0;\nvar bindConsole = function bindConsole() {\n  var oldLog = console.log.bind(console);\n  oldLog('this');\n\n  var newLog = function newLog() {\n    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {\n      args[_key] = arguments[_key];\n    }\n\n    oldLog.apply(undefined, args);\n    oldLog(\"from newlog\");\n    if (consoleContents.length < 10) consoleContents.push((0, _stringify2.default)(args));\n    //oldLog(consoleContents)\n  };\n\n  newLog('thihs', 'and that');\n  console.log = newLog;\n};\nbindConsole();\nconsole.log(\"After bind\");\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNlcnZlci5qcyJdLCJuYW1lcyI6WyJnZW5lcmF0ZVNjb3BlZE5hbWUiLCJjb21waWxlciIsImFwcCIsInVzZSIsIm5vSW5mbyIsInB1YmxpY1BhdGgiLCJvdXRwdXQiLCJyZXEiLCJyZXMiLCJuZXh0IiwicmVxdWlyZSIsImNvbnNvbGVDb250ZW50cyIsImdldCIsInJlcXVlc3QiLCJyZXNwb25zZSIsImNvbnNvbGUiLCJsb2ciLCJwYXJhbXMiLCJvcCIsInNlbmQiLCJwYXRoIiwiZXJyIiwicGFnZSIsIndhdGNoZXIiLCJ3YXRjaCIsIm9uIiwiY2FjaGUiLCJmb3JFYWNoIiwiaWQiLCJ0ZXN0IiwicGx1Z2luIiwic2VydmVyIiwiY3JlYXRlU2VydmVyIiwibGlzdGVuIiwiYWRkciIsImFkZHJlc3MiLCJwb3J0IiwidGlja05vIiwiYmluZENvbnNvbGUiLCJvbGRMb2ciLCJiaW5kIiwibmV3TG9nIiwiYXJncyIsImxlbmd0aCIsInB1c2giXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFBQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7Ozs7QUFFQSxxQ0FBc0IsRUFBQ0Esb0JBQW9CLHNCQUFyQixFQUF0QjtBQUNBLElBQU1DLFdBQVcseUNBQWpCO0FBQ0EsSUFBTUMsTUFBTSx3QkFBWjs7QUFFQTtBQUNBQSxJQUFJQyxHQUFKLENBQVEsb0NBQXFCRixRQUFyQixFQUErQjtBQUNyQ0csVUFBUSxJQUQ2QixFQUN2QkMsWUFBWSxrQkFBT0MsTUFBUCxDQUFjRDtBQURILENBQS9CLENBQVI7QUFHQUgsSUFBSUMsR0FBSixDQUFRLG9DQUFxQkYsUUFBckIsQ0FBUjs7QUFFQTtBQUNBQyxJQUFJQyxHQUFKLENBQVEsVUFBU0ksR0FBVCxFQUFjQyxHQUFkLEVBQW1CQyxJQUFuQixFQUF5QjtBQUMvQkMsVUFBUSxjQUFSLEVBQXdCSCxHQUF4QixFQUE2QkMsR0FBN0IsRUFBa0NDLElBQWxDO0FBQ0QsQ0FG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dCI6Ii9hcHAiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgY2hva2lkYXIgZnJvbSAnY2hva2lkYXInO1xuaW1wb3J0IGNvbmZpZyBmcm9tICcuL3dlYnBhY2suY29uZmlnJztcbmltcG9ydCBjc3NNb2R1bGVzUmVxdWlyZUhvb2sgZnJvbSAnY3NzLW1vZHVsZXMtcmVxdWlyZS1ob29rJztcbmltcG9ydCBleHByZXNzIGZyb20gJ2V4cHJlc3MnO1xuaW1wb3J0IGh0dHAgZnJvbSAnaHR0cCc7XG5pbXBvcnQgd2VicGFjayBmcm9tICd3ZWJwYWNrJztcbmltcG9ydCB3ZWJwYWNrRGV2TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWRldi1taWRkbGV3YXJlJztcbmltcG9ydCB3ZWJwYWNrSG90TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWhvdC1taWRkbGV3YXJlJztcblxuY3NzTW9kdWxlc1JlcXVpcmVIb29rKHtnZW5lcmF0ZVNjb3BlZE5hbWU6ICdbcGF0aF1bbmFtZV0tW2xvY2FsXSd9KTtcbmNvbnN0IGNvbXBpbGVyID0gd2VicGFjayhjb25maWcpO1xuY29uc3QgYXBwID0gZXhwcmVzcygpO1xuXG4vLyBTZXJ2ZSBob3QtcmVsb2FkaW5nIGJ1bmRsZSB0byBjbGllbnRcbmFwcC51c2Uod2VicGFja0Rldk1pZGRsZXdhcmUoY29tcGlsZXIsIHtcbiAgbm9JbmZvOiB0cnVlLCBwdWJsaWNQYXRoOiBjb25maWcub3V0cHV0LnB1YmxpY1BhdGhcbn0pKTtcbmFwcC51c2Uod2VicGFja0hvdE1pZGRsZXdhcmUoY29tcGlsZXIpKTtcblxuLy8gSW5jbHVkZSBzZXJ2ZXIgcm91dGVzIGFzIGEgbWlkZGxld2FyZVxuYXBwLnVzZShmdW5jdGlvbihyZXEsIHJlcywgbmV4dCkge1xuICByZXF1aXJlKCcuL3NlcnZlci9hcHAnKShyZXEsIHJlcywgbmV4dCk7XG59KTtcbmxldCBjb25zb2xlQ29udGVudHMgPSBbXVxuXG5cblxuXG5hcHAuZ2V0KFwiL2NvbnNvbGUvOm9wXCIsIGZ1bmN0aW9uIChyZXF1ZXN0LCByZXNwb25zZSkge1xuICBjb25zb2xlLmxvZyhyZXF1ZXN0LnBhcmFtcy5vcClcbiAgaWYocmVxdWVzdC5wYXJhbXMub3A9PT0nY2xlYXInKXtcbiAgICBjb25zb2xlQ29udGVudHMgPSBbXVxuICB9XG4gIHJlc3BvbnNlLnNlbmQoY29uc29sZUNvbnRlbnRzKTsgXG59KTtcbi8vIEFueXRoaW5nIGVsc2UgZ2V0cyBwYXNzZWQgdG8gdGhlIGNsaWVudCBhcHAncyBzZXJ2ZXIgcmVuZGVyaW5nXG5hcHAuZ2V0KCcqJywgZnVuY3Rpb24ocmVxLCByZXMsIG5leHQpIHtcbiAgcmVxdWlyZSgnLi9jbGllbnQvc2VydmVyLXJlbmRlcicpKHJlcS5wYXRoLCBmdW5jdGlvbihlcnIsIHBhZ2UpIHtcbiAgICBpZiAoZXJyKSByZXR1cm4gbmV4dChlcnIpO1xuICAgIHJlcy5zZW5kKHBhZ2UpO1xuICB9KTtcbn0pO1xuXG4vLyBEbyBcImhvdC1yZWxvYWRpbmdcIiBvZiBleHByZXNzIHN0dWZmIG9uIHRoZSBzZXJ2ZXJcbi8vIFRocm93IGF3YXkgY2FjaGVkIG1vZHVsZXMgYW5kIHJlLXJlcXVpcmUgbmV4dCB0aW1lXG4vLyBFbnN1cmUgdGhlcmUncyBubyBpbXBvcnRhbnQgc3RhdGUgaW4gdGhlcmUhXG5jb25zdCB3YXRjaGVyID0gY2hva2lkYXIud2F0Y2goJy4vc2VydmVyJyk7XG5cbndhdGNoZXIub24oJ3JlYWR5JywgZnVuY3Rpb24oKSB7XG4gIHdhdGNoZXIub24oJ2FsbCcsIGZ1bmN0aW9uKCkge1xuICAgIGNvbnNvbGUubG9nKFwiQ2xlYXJpbmcgL3NlcnZlci8gbW9kdWxlIGNhY2hlIGZyb20gc2VydmVyXCIpO1xuICAgIE9iamVjdC5rZXlzKHJlcXVpcmUuY2FjaGUpLmZvckVhY2goZnVuY3Rpb24oaWQpIHtcbiAgICAgIGlmICgvW1xcL1xcXFxdc2VydmVyW1xcL1xcXFxdLy50ZXN0KGlkKSkgZGVsZXRlIHJlcXVpcmUuY2FjaGVbaWRdO1xuICAgIH0pO1xuICB9KTtcbn0pO1xuXG4vLyBEbyBcImhvdC1yZWxvYWRpbmdcIiBvZiByZWFjdCBzdHVmZiBvbiB0aGUgc2VydmVyXG4vLyBUaHJvdyBhd2F5IHRoZSBjYWNoZWQgY2xpZW50IG1vZHVsZXMgYW5kIGxldCB0aGVtIGJlIHJlLXJlcXVpcmVkIG5leHQgdGltZVxuY29tcGlsZXIucGx1Z2luKCdkb25lJywgZnVuY3Rpb24oKSB7XG4gIGNvbnNvbGUubG9nKFwiQ2xlYXJpbmcgL2NsaWVudC8gbW9kdWxlIGNhY2hlIGZyb20gc2VydmVyXCIpO1xuICBPYmplY3Qua2V5cyhyZXF1aXJlLmNhY2hlKS5mb3JFYWNoKGZ1bmN0aW9uKGlkKSB7XG4gICAgaWYgKC9bXFwvXFxcXF1jbGllbnRbXFwvXFxcXF0vLnRlc3QoaWQpKSBkZWxldGUgcmVxdWlyZS5jYWNoZVtpZF07XG4gIH0pO1xufSk7XG5cbmNvbnN0IHNlcnZlciA9IGh0dHAuY3JlYXRlU2VydmVyKGFwcCk7XG5zZXJ2ZXIubGlzdGVuKDMwMDAsICdsb2NhbGhvc3QnLCBmdW5jdGlvbihlcnIpIHtcbiAgaWYgKGVycikgdGhyb3cgZXJyO1xuXG4gIGNvbnN0IGFkZHIgPSBzZXJ2ZXIuYWRkcmVzcygpO1xuXG4gIGNvbnNvbGUubG9nKCdMaXN0ZW5pbmcgYXQgaHR0cDovLyVzOiVkJywgYWRkci5hZGRyZXNzLCBhZGRyLnBvcnQpO1xufSk7XG5sZXQgdGlja05vID0gMFxubGV0IGJpbmRDb25zb2xlID0gKCkgPT4ge1xuICBsZXQgb2xkTG9nID0gY29uc29sZS5sb2cuYmluZChjb25zb2xlKVxuICBvbGRMb2coJ3RoaXMnKVxuXG4gIGxldCBuZXdMb2cgPSAoLi4uYXJncykgPT4ge1xuICAgIG9sZExvZyguLi5hcmdzKTtcbiAgICBvbGRMb2coXCJmcm9tIG5ld2xvZ1wiKVxuICAgIGlmIChjb25zb2xlQ29udGVudHMubGVuZ3RoIDwgMTApXG4gICAgICBjb25zb2xlQ29udGVudHMucHVzaChKU09OLnN0cmluZ2lmeShhcmdzKSlcbiAgICAvL29sZExvZyhjb25zb2xlQ29udGVudHMpXG4gIH1cblxuICBuZXdMb2coJ3RoaWhzJywnYW5kIHRoYXQnKSBcbiAgY29uc29sZS5sb2cgPSBuZXdMb2dcbn1cbmJpbmRDb25zb2xlKClcbmNvbnNvbGUubG9nKFwiQWZ0ZXIgYmluZFwiKTsgICJdfQ==",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "server.js"
+      ],
+      "names": [
+        "generateScopedName",
+        "compiler",
+        "app",
+        "use",
+        "noInfo",
+        "publicPath",
+        "output",
+        "req",
+        "res",
+        "next",
+        "require",
+        "consoleContents",
+        "get",
+        "request",
+        "response",
+        "console",
+        "log",
+        "params",
+        "op",
+        "send",
+        "path",
+        "err",
+        "page",
+        "watcher",
+        "watch",
+        "on",
+        "cache",
+        "forEach",
+        "id",
+        "test",
+        "plugin",
+        "server",
+        "createServer",
+        "listen",
+        "addr",
+        "address",
+        "port",
+        "tickNo",
+        "bindConsole",
+        "oldLog",
+        "bind",
+        "newLog",
+        "args",
+        "length",
+        "push"
+      ],
+      "mappings": "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",
+      "file": "server.js",
+      "sourceRoot": "/app",
+      "sourcesContent": [
+        "import chokidar from 'chokidar';\nimport config from './webpack.config';\nimport cssModulesRequireHook from 'css-modules-require-hook';\nimport express from 'express';\nimport http from 'http';\nimport webpack from 'webpack';\nimport webpackDevMiddleware from 'webpack-dev-middleware';\nimport webpackHotMiddleware from 'webpack-hot-middleware';\n\ncssModulesRequireHook({generateScopedName: '[path][name]-[local]'});\nconst compiler = webpack(config);\nconst app = express();\n\n// Serve hot-reloading bundle to client\napp.use(webpackDevMiddleware(compiler, {\n  noInfo: true, publicPath: config.output.publicPath\n}));\napp.use(webpackHotMiddleware(compiler));\n\n// Include server routes as a middleware\napp.use(function(req, res, next) {\n  require('./server/app')(req, res, next);\n});\nlet consoleContents = []\n\n\n\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op)\n  if(request.params.op==='clear'){\n    consoleContents = []\n  }\n  response.send(consoleContents); \n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function(req, res, next) {\n  require('./client/server-render')(req.path, function(err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nconst watcher = chokidar.watch('./server');\n\nwatcher.on('ready', function() {\n  watcher.on('all', function() {\n    console.log(\"Clearing /server/ module cache from server\");\n    Object.keys(require.cache).forEach(function(id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function() {\n  console.log(\"Clearing /client/ module cache from server\");\n  Object.keys(require.cache).forEach(function(id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nconst server = http.createServer(app);\nserver.listen(3000, 'localhost', function(err) {\n  if (err) throw err;\n\n  const addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nlet tickNo = 0\nlet bindConsole = () => {\n  let oldLog = console.log.bind(console)\n  oldLog('this')\n\n  let newLog = (...args) => {\n    oldLog(...args);\n    oldLog(\"from newlog\")\n    if (consoleContents.length < 10)\n      consoleContents.push(JSON.stringify(args))\n    //oldLog(consoleContents)\n  }\n\n  newLog('thihs','and that') \n  console.log = newLog\n}\nbindConsole()\nconsole.log(\"After bind\");  "
+      ]
+    },
+    "mtime": 1525271384716
+  },
+  "{\"filename\":\"/app/webpack.config.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],null],[[],{\"ssr\":true}],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "webpack",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpack"
+              }
+            ]
+          },
+          {
+            "source": "path",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "path"
+              }
+            ]
+          },
+          {
+            "source": "querystring",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "qs"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/webpack.config.js",
+      "filenameRelative": "/app/webpack.config.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "ssr": true
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "webpack.config.js",
+      "sourceFileName": "webpack.config.js",
+      "sourceRoot": "/app",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "webpack.config"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _webpack = require('webpack');\n\nvar _webpack2 = _interopRequireDefault(_webpack);\n\nvar _path = require('path');\n\nvar _path2 = _interopRequireDefault(_path);\n\nvar _querystring = require('querystring');\n\nvar _querystring2 = _interopRequireDefault(_querystring);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nprocess.env.NODE_ENV = process.env.NODE_ENV || \"development\";\n\nexports.default = {\n  devtool: '#eval-source-map',\n  entry: ['webpack-hot-middleware/client', './client/app.js'],\n  output: {\n    path: __dirname,\n    filename: 'bundle.js',\n    publicPath: '/'\n  },\n  plugins: [new _webpack2.default.optimize.OccurenceOrderPlugin(), new _webpack2.default.HotModuleReplacementPlugin(), new _webpack2.default.NoErrorsPlugin()],\n  resolve: {\n    extensions: ['', '.js'],\n    alias: {\n      request: 'browser-request'\n    }\n  },\n  module: {\n    loaders: [\n    // Javascript\n    {\n      test: /\\.js$/,\n      loader: 'babel',\n      include: _path2.default.join(__dirname, 'client'),\n      query: {\n        \"env\": {\n          \"development\": {\n            \"presets\": [\"react-hmre\"],\n            \"plugins\": [[\"react-transform\", {\n              \"transforms\": [{\n                \"transform\": \"react-transform-hmr\",\n                \"imports\": [\"react\"],\n                \"locals\": [\"module\"]\n              }]\n            }]]\n          }\n        }\n      }\n    },\n\n    // CSS\n    {\n      test: /\\.css$/,\n      include: _path2.default.join(__dirname, 'client'),\n      loader: 'style-loader!css-loader?' + _querystring2.default.stringify({\n        modules: true,\n        importLoaders: 1,\n        localIdentName: '[path][name]-[local]'\n      })\n    }]\n  }\n};\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2suY29uZmlnLmpzIl0sIm5hbWVzIjpbInByb2Nlc3MiLCJlbnYiLCJOT0RFX0VOViIsImRldnRvb2wiLCJlbnRyeSIsIm91dHB1dCIsInBhdGgiLCJfX2Rpcm5hbWUiLCJmaWxlbmFtZSIsInB1YmxpY1BhdGgiLCJwbHVnaW5zIiwib3B0aW1pemUiLCJPY2N1cmVuY2VPcmRlclBsdWdpbiIsIkhvdE1vZHVsZVJlcGxhY2VtZW50UGx1Z2luIiwiTm9FcnJvcnNQbHVnaW4iLCJyZXNvbHZlIiwiZXh0ZW5zaW9ucyIsImFsaWFzIiwicmVxdWVzdCIsIm1vZHVsZSIsImxvYWRlcnMiLCJ0ZXN0IiwibG9hZGVyIiwiaW5jbHVkZSIsImpvaW4iLCJxdWVyeSIsInN0cmluZ2lmeSIsIm1vZHVsZXMiLCJpbXBvcnRMb2FkZXJzIiwibG9jYWxJZGVudE5hbWUiXSwibWFwcGluZ3MiOiI7Ozs7OztBQUFBOzs7O0FBQ0E7Ozs7QUFDQTs7Ozs7O0FBRUFBLFFBQVFDLEdBQVIsQ0FBWUMsUUFBWixHQUF1QkYsUUFBUUMsR0FBUixDQUFZQyxRQUFaLElBQXdCLGFBQS9DOztrQkFFZTtBQUNiQyxXQUFTLGtCQURJO0FBRWJDLFNBQU8sQ0FDTCwrQkFESyxFQUVMLGlCQUZLLENBRk07QUFNYkMsVUFBUTtBQUNOQyxVQUFNQyxTQURBO0FBRU5DLGNBQVUsV0FGSjtBQUdOQyxnQkFBWTtBQUhOLEdBTks7QUFXYkMsV0FBUyxDQUNQLElBQUksa0JBQVFDLFFBQVIsQ0FBaUJDLG9CQUFyQixFQURPLEVBRVAsSUFBSSxrQkFBUUMsMEJBQVosRUFGTyxFQUdQLElBQUksa0JBQVFDLGNBQVosRUFITyxDQVhJO0FBZ0JiQyxXQUFTO0FBQ1BDLGdCQUFZLENBQUMsRUFBRCxFQUFLLEtBQUwsQ0FETDtBQUVQQyxXQUFPO0FBQ0xDLGVBQVM7QUFESjtBQUZBLEdBaEJJO0FBc0JiQyxVQUFRO0FBQ05DLGFBQVM7QUFDUDtBQUNBO0FBQ0VDLFlBQU0sT0FEUjtBQUVFQyxjQUFRLE9BRlY7QUFHRUMsZUFBUyxlQUFLQyxJQUFMLENBQVVqQixTQUFWLEVBQXFCLFFBQXJCLENBSFg7QUFJRWtCLGFBQU87QUFDTCxlQUFPO0FBQ0wseUJBQWU7QUFDYix1QkFBVyxDQUFDLFlBQUQsQ0FERTtBQUViLHVCQUFXLENBQ1QsQ0FBQyxpQkFBRCxFQUFvQjtBQUNsQiw0QkFBYyxDQUFDO0FBQ2IsNkJBQWEscUJBREE7QUFFYiwyQkFBVyxDQUFDLE9BQUQsQ0FGRTtBQUdiLDBCQUFVLENBQUMsUUFBRDtBQUhHLGVBQUQ7QUFESSxhQUFwQixDQURTO0FBRkU7QUFEVjtBQURGO0FBSlQsS0FGTzs7QUF3QlA7QUFDQTtBQUNFSixZQUFNLFFBRFI7QUFFRUUsZUFBUyxlQUFLQyxJQUFMLENBQVVqQixTQUFWLEVBQXFCLFFBQXJCLENBRlg7QUFHRWUsY0FBUSw2QkFBNkIsc0JBQUdJLFNBQUgsQ0FBYTtBQUNoREMsaUJBQVMsSUFEdUM7QUFFaERDLHVCQUFlLENBRmlDO0FBR2hEQyx3QkFBZ0I7QUFIZ0MsT0FBYjtBQUh2QyxLQXpCTztBQURIO0FBdEJLLEMiLCJmaWxlIjoid2VicGFjay5jb25maWcuanMiLCJzb3VyY2VSb290IjoiL2FwcCIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB3ZWJwYWNrIGZyb20gJ3dlYnBhY2snO1xuaW1wb3J0IHBhdGggZnJvbSAncGF0aCc7XG5pbXBvcnQgcXMgZnJvbSAncXVlcnlzdHJpbmcnO1xuXG5wcm9jZXNzLmVudi5OT0RFX0VOViA9IHByb2Nlc3MuZW52Lk5PREVfRU5WIHx8IFwiZGV2ZWxvcG1lbnRcIjtcblxuZXhwb3J0IGRlZmF1bHQge1xuICBkZXZ0b29sOiAnI2V2YWwtc291cmNlLW1hcCcsXG4gIGVudHJ5OiBbXG4gICAgJ3dlYnBhY2staG90LW1pZGRsZXdhcmUvY2xpZW50JyxcbiAgICAnLi9jbGllbnQvYXBwLmpzJ1xuICBdLFxuICBvdXRwdXQ6IHtcbiAgICBwYXRoOiBfX2Rpcm5hbWUsXG4gICAgZmlsZW5hbWU6ICdidW5kbGUuanMnLFxuICAgIHB1YmxpY1BhdGg6ICcvJ1xuICB9LFxuICBwbHVnaW5zOiBbXG4gICAgbmV3IHdlYnBhY2sub3B0aW1pemUuT2NjdXJlbmNlT3JkZXJQbHVnaW4oKSxcbiAgICBuZXcgd2VicGFjay5Ib3RNb2R1bGVSZXBsYWNlbWVudFBsdWdpbigpLFxuICAgIG5ldyB3ZWJwYWNrLk5vRXJyb3JzUGx1Z2luKClcbiAgXSxcbiAgcmVzb2x2ZToge1xuICAgIGV4dGVuc2lvbnM6IFsnJywgJy5qcyddLFxuICAgIGFsaWFzOiB7XG4gICAgICByZXF1ZXN0OiAnYnJvd3Nlci1yZXF1ZXN0J1xuICAgIH1cbiAgfSxcbiAgbW9kdWxlOiB7XG4gICAgbG9hZGVyczogW1xuICAgICAgLy8gSmF2YXNjcmlwdFxuICAgICAge1xuICAgICAgICB0ZXN0OiAvXFwuanMkLyxcbiAgICAgICAgbG9hZGVyOiAnYmFiZWwnLFxuICAgICAgICBpbmNsdWRlOiBwYXRoLmpvaW4oX19kaXJuYW1lLCAnY2xpZW50JyksXG4gICAgICAgIHF1ZXJ5OiB7XG4gICAgICAgICAgXCJlbnZcIjoge1xuICAgICAgICAgICAgXCJkZXZlbG9wbWVudFwiOiB7XG4gICAgICAgICAgICAgIFwicHJlc2V0c1wiOiBbXCJyZWFjdC1obXJlXCJdLFxuICAgICAgICAgICAgICBcInBsdWdpbnNcIjogW1xuICAgICAgICAgICAgICAgIFtcInJlYWN0LXRyYW5zZm9ybVwiLCB7XG4gICAgICAgICAgICAgICAgICBcInRyYW5zZm9ybXNcIjogW3tcbiAgICAgICAgICAgICAgICAgICAgXCJ0cmFuc2Zvcm1cIjogXCJyZWFjdC10cmFuc2Zvcm0taG1yXCIsXG4gICAgICAgICAgICAgICAgICAgIFwiaW1wb3J0c1wiOiBbXCJyZWFjdFwiXSxcbiAgICAgICAgICAgICAgICAgICAgXCJsb2NhbHNcIjogW1wibW9kdWxlXCJdXG4gICAgICAgICAgICAgICAgICB9XVxuICAgICAgICAgICAgICAgIH1dXG4gICAgICAgICAgICAgIF1cbiAgICAgICAgICAgIH1cbiAgICAgICAgICB9LFxuICAgICAgICB9XG4gICAgICB9LFxuXG4gICAgICAvLyBDU1NcbiAgICAgIHtcbiAgICAgICAgdGVzdDogL1xcLmNzcyQvLFxuICAgICAgICBpbmNsdWRlOiBwYXRoLmpvaW4oX19kaXJuYW1lLCAnY2xpZW50JyksXG4gICAgICAgIGxvYWRlcjogJ3N0eWxlLWxvYWRlciFjc3MtbG9hZGVyPycgKyBxcy5zdHJpbmdpZnkoe1xuICAgICAgICAgIG1vZHVsZXM6IHRydWUsXG4gICAgICAgICAgaW1wb3J0TG9hZGVyczogMSxcbiAgICAgICAgICBsb2NhbElkZW50TmFtZTogJ1twYXRoXVtuYW1lXS1bbG9jYWxdJ1xuICAgICAgICB9KVxuICAgICAgfVxuXG4gICAgXVxuICB9XG59O1xuIl19",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "webpack.config.js"
+      ],
+      "names": [
+        "process",
+        "env",
+        "NODE_ENV",
+        "devtool",
+        "entry",
+        "output",
+        "path",
+        "__dirname",
+        "filename",
+        "publicPath",
+        "plugins",
+        "optimize",
+        "OccurenceOrderPlugin",
+        "HotModuleReplacementPlugin",
+        "NoErrorsPlugin",
+        "resolve",
+        "extensions",
+        "alias",
+        "request",
+        "module",
+        "loaders",
+        "test",
+        "loader",
+        "include",
+        "join",
+        "query",
+        "stringify",
+        "modules",
+        "importLoaders",
+        "localIdentName"
+      ],
+      "mappings": ";;;;;;AAAA;;;;AACA;;;;AACA;;;;;;AAEAA,QAAQC,GAAR,CAAYC,QAAZ,GAAuBF,QAAQC,GAAR,CAAYC,QAAZ,IAAwB,aAA/C;;kBAEe;AACbC,WAAS,kBADI;AAEbC,SAAO,CACL,+BADK,EAEL,iBAFK,CAFM;AAMbC,UAAQ;AACNC,UAAMC,SADA;AAENC,cAAU,WAFJ;AAGNC,gBAAY;AAHN,GANK;AAWbC,WAAS,CACP,IAAI,kBAAQC,QAAR,CAAiBC,oBAArB,EADO,EAEP,IAAI,kBAAQC,0BAAZ,EAFO,EAGP,IAAI,kBAAQC,cAAZ,EAHO,CAXI;AAgBbC,WAAS;AACPC,gBAAY,CAAC,EAAD,EAAK,KAAL,CADL;AAEPC,WAAO;AACLC,eAAS;AADJ;AAFA,GAhBI;AAsBbC,UAAQ;AACNC,aAAS;AACP;AACA;AACEC,YAAM,OADR;AAEEC,cAAQ,OAFV;AAGEC,eAAS,eAAKC,IAAL,CAAUjB,SAAV,EAAqB,QAArB,CAHX;AAIEkB,aAAO;AACL,eAAO;AACL,yBAAe;AACb,uBAAW,CAAC,YAAD,CADE;AAEb,uBAAW,CACT,CAAC,iBAAD,EAAoB;AAClB,4BAAc,CAAC;AACb,6BAAa,qBADA;AAEb,2BAAW,CAAC,OAAD,CAFE;AAGb,0BAAU,CAAC,QAAD;AAHG,eAAD;AADI,aAApB,CADS;AAFE;AADV;AADF;AAJT,KAFO;;AAwBP;AACA;AACEJ,YAAM,QADR;AAEEE,eAAS,eAAKC,IAAL,CAAUjB,SAAV,EAAqB,QAArB,CAFX;AAGEe,cAAQ,6BAA6B,sBAAGI,SAAH,CAAa;AAChDC,iBAAS,IADuC;AAEhDC,uBAAe,CAFiC;AAGhDC,wBAAgB;AAHgC,OAAb;AAHvC,KAzBO;AADH;AAtBK,C",
+      "file": "webpack.config.js",
+      "sourceRoot": "/app",
+      "sourcesContent": [
+        "import webpack from 'webpack';\nimport path from 'path';\nimport qs from 'querystring';\n\nprocess.env.NODE_ENV = process.env.NODE_ENV || \"development\";\n\nexport default {\n  devtool: '#eval-source-map',\n  entry: [\n    'webpack-hot-middleware/client',\n    './client/app.js'\n  ],\n  output: {\n    path: __dirname,\n    filename: 'bundle.js',\n    publicPath: '/'\n  },\n  plugins: [\n    new webpack.optimize.OccurenceOrderPlugin(),\n    new webpack.HotModuleReplacementPlugin(),\n    new webpack.NoErrorsPlugin()\n  ],\n  resolve: {\n    extensions: ['', '.js'],\n    alias: {\n      request: 'browser-request'\n    }\n  },\n  module: {\n    loaders: [\n      // Javascript\n      {\n        test: /\\.js$/,\n        loader: 'babel',\n        include: path.join(__dirname, 'client'),\n        query: {\n          \"env\": {\n            \"development\": {\n              \"presets\": [\"react-hmre\"],\n              \"plugins\": [\n                [\"react-transform\", {\n                  \"transforms\": [{\n                    \"transform\": \"react-transform-hmr\",\n                    \"imports\": [\"react\"],\n                    \"locals\": [\"module\"]\n                  }]\n                }]\n              ]\n            }\n          },\n        }\n      },\n\n      // CSS\n      {\n        test: /\\.css$/,\n        include: path.join(__dirname, 'client'),\n        loader: 'style-loader!css-loader?' + qs.stringify({\n          modules: true,\n          importLoaders: 1,\n          localIdentName: '[path][name]-[local]'\n        })\n      }\n\n    ]\n  }\n};\n"
+      ]
+    },
+    "mtime": 1525271083886
+  },
+  "{\"filename\":\"/app/server.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],{\"ssr\":true}],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "chokidar",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "chokidar"
+              }
+            ]
+          },
+          {
+            "source": "./webpack.config",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "config"
+              }
+            ]
+          },
+          {
+            "source": "css-modules-require-hook",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "cssModulesRequireHook"
+              }
+            ]
+          },
+          {
+            "source": "express",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "express"
+              }
+            ]
+          },
+          {
+            "source": "http",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "http"
+              }
+            ]
+          },
+          {
+            "source": "webpack",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpack"
+              }
+            ]
+          },
+          {
+            "source": "webpack-dev-middleware",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpackDevMiddleware"
+              }
+            ]
+          },
+          {
+            "source": "webpack-hot-middleware",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpackHotMiddleware"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/server.js",
+      "filenameRelative": "/app/server.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          {
+            "ssr": true
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "server.js",
+      "sourceFileName": "server.js",
+      "sourceRoot": "/app",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "server"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nvar _chokidar = require('chokidar');\n\nvar _chokidar2 = _interopRequireDefault(_chokidar);\n\nvar _webpack = require('./webpack.config');\n\nvar _webpack2 = _interopRequireDefault(_webpack);\n\nvar _cssModulesRequireHook = require('css-modules-require-hook');\n\nvar _cssModulesRequireHook2 = _interopRequireDefault(_cssModulesRequireHook);\n\nvar _express = require('express');\n\nvar _express2 = _interopRequireDefault(_express);\n\nvar _http = require('http');\n\nvar _http2 = _interopRequireDefault(_http);\n\nvar _webpack3 = require('webpack');\n\nvar _webpack4 = _interopRequireDefault(_webpack3);\n\nvar _webpackDevMiddleware = require('webpack-dev-middleware');\n\nvar _webpackDevMiddleware2 = _interopRequireDefault(_webpackDevMiddleware);\n\nvar _webpackHotMiddleware = require('webpack-hot-middleware');\n\nvar _webpackHotMiddleware2 = _interopRequireDefault(_webpackHotMiddleware);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n(0, _cssModulesRequireHook2.default)({ generateScopedName: '[path][name]-[local]' });\nvar compiler = (0, _webpack4.default)(_webpack2.default);\nvar app = (0, _express2.default)();\n\n// Serve hot-reloading bundle to client\napp.use((0, _webpackDevMiddleware2.default)(compiler, {\n  noInfo: true, publicPath: _webpack2.default.output.publicPath\n}));\napp.use((0, _webpackHotMiddleware2.default)(compiler));\n\n// Include server routes as a middleware\napp.use(function (req, res, next) {\n  require('./server/app')(req, res, next);\n});\nvar consoleContents = [];\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op);\n  if (request.params.op === 'clear') {\n    consoleContents = [];\n  }\n  response.send(consoleContents);\n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function (req, res, next) {\n  require('./client/server-render')(req.path, function (err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nvar watcher = _chokidar2.default.watch('./server');\n\nwatcher.on('ready', function () {\n  watcher.on('all', function () {\n    console.log(\"Clearing /server/ module cache from server\");\n    Object.keys(require.cache).forEach(function (id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function () {\n  console.log(\"Clearing /client/ module cache from server\");\n  Object.keys(require.cache).forEach(function (id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nvar server = _http2.default.createServer(app);\nserver.listen(3000, 'localhost', function (err) {\n  if (err) throw err;\n\n  var addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nvar tickNo = 0;\nvar bindConsole = function bindConsole() {\n  var oldLog = console.log.bind(console);\n  oldLog('this');\n\n  var newLog = function newLog() {\n    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {\n      args[_key] = arguments[_key];\n    }\n\n    oldLog.apply(undefined, args);\n    oldLog(\"from newlog\");\n    if (consoleContents.length < 10) consoleContents.push(JSON.stringify(args));\n    //oldLog(consoleContents)\n  };\n\n  newLog('thihs', 'and that');\n  console.log = newLog;\n};\nbindConsole();\nconsole.log(\"After bind\");\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNlcnZlci5qcyJdLCJuYW1lcyI6WyJnZW5lcmF0ZVNjb3BlZE5hbWUiLCJjb21waWxlciIsImFwcCIsInVzZSIsIm5vSW5mbyIsInB1YmxpY1BhdGgiLCJvdXRwdXQiLCJyZXEiLCJyZXMiLCJuZXh0IiwicmVxdWlyZSIsImNvbnNvbGVDb250ZW50cyIsImdldCIsInJlcXVlc3QiLCJyZXNwb25zZSIsImNvbnNvbGUiLCJsb2ciLCJwYXJhbXMiLCJvcCIsInNlbmQiLCJwYXRoIiwiZXJyIiwicGFnZSIsIndhdGNoZXIiLCJ3YXRjaCIsIm9uIiwiT2JqZWN0Iiwia2V5cyIsImNhY2hlIiwiZm9yRWFjaCIsImlkIiwidGVzdCIsInBsdWdpbiIsInNlcnZlciIsImNyZWF0ZVNlcnZlciIsImxpc3RlbiIsImFkZHIiLCJhZGRyZXNzIiwicG9ydCIsInRpY2tObyIsImJpbmRDb25zb2xlIiwib2xkTG9nIiwiYmluZCIsIm5ld0xvZyIsImFyZ3MiLCJsZW5ndGgiLCJwdXNoIiwiSlNPTiIsInN0cmluZ2lmeSJdLCJtYXBwaW5ncyI6Ijs7QUFBQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7Ozs7QUFFQSxxQ0FBc0IsRUFBQ0Esb0JBQW9CLHNCQUFyQixFQUF0QjtBQUNBLElBQU1DLFdBQVcseUNBQWpCO0FBQ0EsSUFBTUMsTUFBTSx3QkFBWjs7QUFFQTtBQUNBQSxJQUFJQyxHQUFKLENBQVEsb0NBQXFCRixRQUFyQixFQUErQjtBQUNyQ0csVUFBUSxJQUQ2QixFQUN2QkMsWUFBWSxrQkFBT0MsTUFBUCxDQUFjRDtBQURILENBQS9CLENBQVI7QUFHQUgsSUFBSUMsR0FBSixDQUFRLG9DQUFxQkYsUUFBckIsQ0FBUjs7QUFFQTtBQUNBQyxJQUFJQyxHQUFKLENBQVEsVUFBU0ksR0FBVCxFQUFjQyxHQUFkLEVBQW1CQyxJQUFuQixFQUF5QjtBQUMvQkMsVUFBUSxjQUFSLEVBQXdCSCxHQUF4QixFQUE2QkMs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QWVBSDtBQUNBekIsUUFBUUMsR0FBUixDQUFZLFlBQVoiLCJmaWxlIjoic2VydmVyLmpzIiwic291cmNlUm9vdCI6Ii9hcHAiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgY2hva2lkYXIgZnJvbSAnY2hva2lkYXInO1xuaW1wb3J0IGNvbmZpZyBmcm9tICcuL3dlYnBhY2suY29uZmlnJztcbmltcG9ydCBjc3NNb2R1bGVzUmVxdWlyZUhvb2sgZnJvbSAnY3NzLW1vZHVsZXMtcmVxdWlyZS1ob29rJztcbmltcG9ydCBleHByZXNzIGZyb20gJ2V4cHJlc3MnO1xuaW1wb3J0IGh0dHAgZnJvbSAnaHR0cCc7XG5pbXBvcnQgd2VicGFjayBmcm9tICd3ZWJwYWNrJztcbmltcG9ydCB3ZWJwYWNrRGV2TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWRldi1taWRkbGV3YXJlJztcbmltcG9ydCB3ZWJwYWNrSG90TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWhvdC1taWRkbGV3YXJlJztcblxuY3NzTW9kdWxlc1JlcXVpcmVIb29rKHtnZW5lcmF0ZVNjb3BlZE5hbWU6ICdbcGF0aF1bbmFtZV0tW2xvY2FsXSd9KTtcbmNvbnN0IGNvbXBpbGVyID0gd2VicGFjayhjb25maWcpO1xuY29uc3QgYXBwID0gZXhwcmVzcygpO1xuXG4vLyBTZXJ2ZSBob3QtcmVsb2FkaW5nIGJ1bmRsZSB0byBjbGllbnRcbmFwcC51c2Uod2VicGFja0Rldk1pZGRsZXdhcmUoY29tcGlsZXIsIHtcbiAgbm9JbmZvOiB0cnVlLCBwdWJsaWNQYXRoOiBjb25maWcub3V0cHV0LnB1YmxpY1BhdGhcbn0pKTtcbmFwcC51c2Uod2VicGFja0hvdE1pZGRsZXdhcmUoY29tcGlsZXIpKTtcblxuLy8gSW5jbHVkZSBzZXJ2ZXIgcm91dGVzIGFzIGEgbWlkZGxld2FyZVxuYXBwLnVzZShmdW5jdGlvbihyZXEsIHJlcywgbmV4dCkge1xuICByZXF1aXJlKCcuL3NlcnZlci9hcHAnKShyZXEsIHJlcywgbmV4dCk7XG59KTtcbmxldCBjb25zb2xlQ29udGVudHMgPSBbXVxuXG5cblxuXG5hcHAuZ2V0KFwiL2NvbnNvbGUvOm9wXCIsIGZ1bmN0aW9uIChyZXF1ZXN0LCByZXNwb25zZSkge1xuICBjb25zb2xlLmxvZyhyZXF1ZXN0LnBhcmFtcy5vcClcbiAgaWYocmVxdWVzdC5wYXJhbXMub3A9PT0nY2xlYXInKXtcbiAgICBjb25zb2xlQ29udGVudHMgPSBbXVxuICB9XG4gIHJlc3BvbnNlLnNlbmQoY29uc29sZUNvbnRlbnRzKTsgXG59KTtcbi8vIEFueXRoaW5nIGVsc2UgZ2V0cyBwYXNzZWQgdG8gdGhlIGNsaWVudCBhcHAncyBzZXJ2ZXIgcmVuZGVyaW5nXG5hcHAuZ2V0KCcqJywgZnVuY3Rpb24ocmVxLCByZXMsIG5leHQpIHtcbiAgcmVxdWlyZSgnLi9jbGllbnQvc2VydmVyLXJlbmRlcicpKHJlcS5wYXRoLCBmdW5jdGlvbihlcnIsIHBhZ2UpIHtcbiAgICBpZiAoZXJyKSByZXR1cm4gbmV4dChlcnIpO1xuICAgIHJlcy5zZW5kKHBhZ2UpO1xuICB9KTtcbn0pO1xuXG4vLyBEbyBcImhvdC1yZWxvYWRpbmdcIiBvZiBleHByZXNzIHN0dWZmIG9uIHRoZSBzZXJ2ZXJcbi8vIFRocm93IGF3YXkgY2FjaGVkIG1vZHVsZXMgYW5kIHJlLXJlcXVpcmUgbmV4dCB0aW1lXG4vLyBFbnN1cmUgdGhlcmUncyBubyBpbXBvcnRhbnQgc3RhdGUgaW4gdGhlcmUhXG5jb25zdCB3YXRjaGVyID0gY2hva2lkYXIud2F0Y2goJy4vc2VydmVyJyk7XG5cbndhdGNoZXIub24oJ3JlYWR5JywgZnVuY3Rpb24oKSB7XG4gIHdhdGNoZXIub24oJ2FsbCcsIGZ1bmN0aW9uKCkge1xuICAgIGNvbnNvbGUubG9nKFwiQ2xlYXJpbmcgL3NlcnZlci8gbW9kdWxlIGNhY2hlIGZyb20gc2VydmVyXCIpO1xuICAgIE9iamVjdC5rZXlzKHJlcXVpcmUuY2FjaGUpLmZvckVhY2goZnVuY3Rpb24oaWQpIHtcbiAgICAgIGlmICgvW1xcL1xcXFxdc2VydmVyW1xcL1xcXFxdLy50ZXN0KGlkKSkgZGVsZXRlIHJlcXVpcmUuY2FjaGVbaWRdO1xuICAgIH0pO1xuICB9KTtcbn0pO1xuXG4vLyBEbyBcImhvdC1yZWxvYWRpbmdcIiBvZiByZWFjdCBzdHVmZiBvbiB0aGUgc2VydmVyXG4vLyBUaHJvdyBhd2F5IHRoZSBjYWNoZWQgY2xpZW50IG1vZHVsZXMgYW5kIGxldCB0aGVtIGJlIHJlLXJlcXVpcmVkIG5leHQgdGltZVxuY29tcGlsZXIucGx1Z2luKCdkb25lJywgZnVuY3Rpb24oKSB7XG4gIGNvbnNvbGUubG9nKFwiQ2xlYXJpbmcgL2NsaWVudC8gbW9kdWxlIGNhY2hlIGZyb20gc2VydmVyXCIpO1xuICBPYmplY3Qua2V5cyhyZXF1aXJlLmNhY2hlKS5mb3JFYWNoKGZ1bmN0aW9uKGlkKSB7XG4gICAgaWYgKC9bXFwvXFxcXF1jbGllbnRbXFwvXFxcXF0vLnRlc3QoaWQpKSBkZWxldGUgcmVxdWlyZS5jYWNoZVtpZF07XG4gIH0pO1xufSk7XG5cbmNvbnN0IHNlcnZlciA9IGh0dHAuY3JlYXRlU2VydmVyKGFwcCk7XG5zZXJ2ZXIubGlzdGVuKDMwMDAsICdsb2NhbGhvc3QnLCBmdW5jdGlvbihlcnIpIHtcbiAgaWYgKGVycikgdGhyb3cgZXJyO1xuXG4gIGNvbnN0IGFkZHIgPSBzZXJ2ZXIuYWRkcmVzcygpO1xuXG4gIGNvbnNvbGUubG9nKCdMaXN0ZW5pbmcgYXQgaHR0cDovLyVzOiVkJywgYWRkci5hZGRyZXNzLCBhZGRyLnBvcnQpO1xufSk7XG5sZXQgdGlja05vID0gMFxubGV0IGJpbmRDb25zb2xlID0gKCkgPT4ge1xuICBsZXQgb2xkTG9nID0gY29uc29sZS5sb2cuYmluZChjb25zb2xlKVxuICBvbGRMb2coJ3RoaXMnKVxuXG4gIGxldCBuZXdMb2cgPSAoLi4uYXJncykgPT4ge1xuICAgIG9sZExvZyguLi5hcmdzKTtcbiAgICBvbGRMb2coXCJmcm9tIG5ld2xvZ1wiKVxuICAgIGlmIChjb25zb2xlQ29udGVudHMubGVuZ3RoIDwgMTApXG4gICAgICBjb25zb2xlQ29udGVudHMucHVzaChKU09OLnN0cmluZ2lmeShhcmdzKSlcbiAgICAvL29sZExvZyhjb25zb2xlQ29udGVudHMpXG4gIH1cblxuICBuZXdMb2coJ3RoaWhzJywnYW5kIHRoYXQnKSBcbiAgY29uc29sZS5sb2cgPSBuZXdMb2dcbn1cbmJpbmRDb25zb2xlKClcbmNvbnNvbGUubG9nKFwiQWZ0ZXIgYmluZFwiKTsgICJdfQ==",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "server.js"
+      ],
+      "names": [
+        "generateScopedName",
+        "compiler",
+        "app",
+        "use",
+        "noInfo",
+        "publicPath",
+        "output",
+        "req",
+        "res",
+        "next",
+        "require",
+        "consoleContents",
+        "get",
+        "request",
+        "response",
+        "console",
+        "log",
+        "params",
+        "op",
+        "send",
+        "path",
+        "err",
+        "page",
+        "watcher",
+        "watch",
+        "on",
+        "Object",
+        "keys",
+        "cache",
+        "forEach",
+        "id",
+        "test",
+        "plugin",
+        "server",
+        "createServer",
+        "listen",
+        "addr",
+        "address",
+        "port",
+        "tickNo",
+        "bindConsole",
+        "oldLog",
+        "bind",
+        "newLog",
+        "args",
+        "length",
+        "push",
+        "JSON",
+        "stringify"
+      ],
+      "mappings": ";;AAAA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;AACA;;;;;;AAEA,qCAAsB,EAACA,oBAAoB,sBAArB,EAAtB;AACA,IAAMC,WAAW,yCAAjB;AACA,IAAMC,MAAM,wBAAZ;;AAEA;AACAA,IAAIC,GAAJ,CAAQ,oCAAqBF,QAArB,EAA+B;AACrCG,UAAQ,IAD6B,EACvBC,YAAY,kBAAOC,MAAP,CAAcD;AADH,CAA/B,CAAR;AAGAH,IAAIC,GAAJ,CAAQ,oCAAqBF,QAArB,CAAR;;AAEA;AACAC,IAAIC,GAAJ,CAAQ,UAASI,GAAT,EAAcC,GAAd,EAAmBC,IAAnB,EAAyB;AAC/BC,UAAQ,cAAR,EAAwBH,GAAxB,EAA6BC,GAA7B,EAAkCC,IAAlC;AACD,CAFD;AAGA,IAAIE,kBAAkB,EAAtB;;AAKAT,IAAIU,GAAJ,CAAQ,cAAR,EAAwB,UAAUC,OAAV,EAAmBC,QAAnB,EAA6B;AACnDC,UAAQC,GAAR,CAAYH,QAAQI,MAAR,CAAeC,EAA3B;AACA,MAAGL,QAAQI,MAAR,CAAeC,EAAf,KAAoB,OAAvB,EAA+B;AAC7BP,sBAAkB,EAAlB;AACD;AACDG,WAASK,IAAT,CAAcR,eAAd;AACD,CAND;AAOA;AACAT,IAAIU,GAAJ,CAAQ,GAAR,EAAa,UAASL,GAAT,EAAcC,GAAd,EAAmBC,IAAnB,EAAyB;AACpCC,UAAQ,wBAAR,EAAkCH,IAAIa,IAAtC,EAA4C,UAASC,GAAT,EAAcC,IAAd,EAAoB;AAC9D,QAAID,GAAJ,EAAS,OAAOZ,KAAKY,GAAL,CAAP;AACTb,QAAIW,IAAJ,CAASG,IAAT;AACD,GAHD;AAID,CALD;;AAOA;AACA;AACA;AACA,IAAMC,UAAU,mBAASC,KAAT,CAAe,UAAf,CAAhB;;AAEAD,QAAQE,EAAR,CAAW,OAAX,EAAoB,YAAW;AAC7BF,UAAQE,EAAR,CAAW,KAAX,EAAkB,YAAW;AAC3BV,YAAQC,GAAR,CAAY,4CAAZ;AACAU,WAAOC,IAAP,CAAYjB,QAAQkB,KAApB,EAA2BC,OAA3B,CAAmC,UAASC,EAAT,EAAa;AAC9C,UAAI,qBAAqBC,IAArB,CAA0BD,EAA1B,CAAJ,EAAmC,OAAOpB,QAAQkB,KAAR,CAAcE,EAAd,CAAP;AACpC,KAFD;AAGD,GALD;AAMD,CAPD;;AASA;AACA;AACA7B,SAAS+B,MAAT,CAAgB,MAAhB,EAAwB,YAAW;AACjCjB,UAAQC,GAAR,CAAY,4CAAZ;AACAU,SAAOC,IAAP,CAAYjB,QAAQkB,KAApB,EAA2BC,OAA3B,CAAmC,UAASC,EAAT,EAAa;AAC9C,QAAI,qBAAqBC,IAArB,CAA0BD,EAA1B,CAAJ,EAAmC,OAAOpB,QAAQkB,KAAR,CAAcE,EAAd,CAAP;AACpC,GAFD;AAGD,CALD;;AAOA,IAAMG,SAAS,eAAKC,YAAL,CAAkBhC,GAAlB,CAAf;AACA+B,OAAOE,MAAP,CAAc,IAAd,EAAoB,WAApB,EAAiC,UAASd,GAAT,EAAc;AAC7C,MAAIA,GAAJ,EAAS,MAAMA,GAAN;;AAET,MAAMe,OAAOH,OAAOI,OAAP,EAAb;;AAEAtB,UAAQC,GAAR,CAAY,2BAAZ,EAAyCoB,KAAKC,OAA9C,EAAuDD,KAAKE,IAA5D;AACD,CAND;AAOA,IAAIC,SAAS,CAAb;AACA,IAAIC,cAAc,SAAdA,WAAc,GAAM;AACtB,MAAIC,SAAS1B,QAAQC,GAAR,CAAY0B,IAAZ,CAAiB3B,OAAjB,CAAb;AACA0B,SAAO,MAAP;;AAEA,MAAIE,SAAS,SAATA,MAAS,GAAa;AAAA,sCAATC,IAAS;AAATA,UAAS;AAAA;;AACxBH,4BAAUG,IAAV;AACAH,WAAO,aAAP;AACA,QAAI9B,gBAAgBkC,MAAhB,GAAyB,EAA7B,EACElC,gBAAgBmC,IAAhB,CAAqBC,KAAKC,SAAL,CAAeJ,IAAf,CAArB;AACF;AACD,GAND;;AAQAD,SAAO,OAAP,EAAe,UAAf;AACA5B,UAAQC,GAAR,GAAc2B,MAAd;AACD,CAdD;AAeAH;AACAzB,QAAQC,GAAR,CAAY,YAAZ",
+      "file": "server.js",
+      "sourceRoot": "/app",
+      "sourcesContent": [
+        "import chokidar from 'chokidar';\nimport config from './webpack.config';\nimport cssModulesRequireHook from 'css-modules-require-hook';\nimport express from 'express';\nimport http from 'http';\nimport webpack from 'webpack';\nimport webpackDevMiddleware from 'webpack-dev-middleware';\nimport webpackHotMiddleware from 'webpack-hot-middleware';\n\ncssModulesRequireHook({generateScopedName: '[path][name]-[local]'});\nconst compiler = webpack(config);\nconst app = express();\n\n// Serve hot-reloading bundle to client\napp.use(webpackDevMiddleware(compiler, {\n  noInfo: true, publicPath: config.output.publicPath\n}));\napp.use(webpackHotMiddleware(compiler));\n\n// Include server routes as a middleware\napp.use(function(req, res, next) {\n  require('./server/app')(req, res, next);\n});\nlet consoleContents = []\n\n\n\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op)\n  if(request.params.op==='clear'){\n    consoleContents = []\n  }\n  response.send(consoleContents); \n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function(req, res, next) {\n  require('./client/server-render')(req.path, function(err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nconst watcher = chokidar.watch('./server');\n\nwatcher.on('ready', function() {\n  watcher.on('all', function() {\n    console.log(\"Clearing /server/ module cache from server\");\n    Object.keys(require.cache).forEach(function(id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function() {\n  console.log(\"Clearing /client/ module cache from server\");\n  Object.keys(require.cache).forEach(function(id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nconst server = http.createServer(app);\nserver.listen(3000, 'localhost', function(err) {\n  if (err) throw err;\n\n  const addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nlet tickNo = 0\nlet bindConsole = () => {\n  let oldLog = console.log.bind(console)\n  oldLog('this')\n\n  let newLog = (...args) => {\n    oldLog(...args);\n    oldLog(\"from newlog\")\n    if (consoleContents.length < 10)\n      consoleContents.push(JSON.stringify(args))\n    //oldLog(consoleContents)\n  }\n\n  newLog('thihs','and that') \n  console.log = newLog\n}\nbindConsole()\nconsole.log(\"After bind\");  "
+      ]
+    },
+    "mtime": 1525271384716
+  },
+  "{\"filename\":\"/app/server.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],{\"ssr\":true}],[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "chokidar",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "chokidar"
+              }
+            ]
+          },
+          {
+            "source": "./webpack.config",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "config"
+              }
+            ]
+          },
+          {
+            "source": "css-modules-require-hook",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "cssModulesRequireHook"
+              }
+            ]
+          },
+          {
+            "source": "express",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "express"
+              }
+            ]
+          },
+          {
+            "source": "http",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "http"
+              }
+            ]
+          },
+          {
+            "source": "webpack",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpack"
+              }
+            ]
+          },
+          {
+            "source": "webpack-dev-middleware",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpackDevMiddleware"
+              }
+            ]
+          },
+          {
+            "source": "webpack-hot-middleware",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpackHotMiddleware"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/server.js",
+      "filenameRelative": "/app/server.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          {
+            "ssr": true
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "server.js",
+      "sourceFileName": "server.js",
+      "sourceRoot": "/app",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "server"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nvar _stringify = require('babel-runtime/core-js/json/stringify');\n\nvar _stringify2 = _interopRequireDefault(_stringify);\n\nvar _keys = require('babel-runtime/core-js/object/keys');\n\nvar _keys2 = _interopRequireDefault(_keys);\n\nvar _chokidar = require('chokidar');\n\nvar _chokidar2 = _interopRequireDefault(_chokidar);\n\nvar _webpack = require('./webpack.config');\n\nvar _webpack2 = _interopRequireDefault(_webpack);\n\nvar _cssModulesRequireHook = require('css-modules-require-hook');\n\nvar _cssModulesRequireHook2 = _interopRequireDefault(_cssModulesRequireHook);\n\nvar _express = require('express');\n\nvar _express2 = _interopRequireDefault(_express);\n\nvar _http = require('http');\n\nvar _http2 = _interopRequireDefault(_http);\n\nvar _webpack3 = require('webpack');\n\nvar _webpack4 = _interopRequireDefault(_webpack3);\n\nvar _webpackDevMiddleware = require('webpack-dev-middleware');\n\nvar _webpackDevMiddleware2 = _interopRequireDefault(_webpackDevMiddleware);\n\nvar _webpackHotMiddleware = require('webpack-hot-middleware');\n\nvar _webpackHotMiddleware2 = _interopRequireDefault(_webpackHotMiddleware);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n(0, _cssModulesRequireHook2.default)({ generateScopedName: '[path][name]-[local]' });\nvar compiler = (0, _webpack4.default)(_webpack2.default);\nvar app = (0, _express2.default)();\n\n// Serve hot-reloading bundle to client\napp.use((0, _webpackDevMiddleware2.default)(compiler, {\n  noInfo: true, publicPath: _webpack2.default.output.publicPath\n}));\napp.use((0, _webpackHotMiddleware2.default)(compiler));\n\n// Include server routes as a middleware\napp.use(function (req, res, next) {\n  require('./server/app')(req, res, next);\n});\nvar consoleContents = [];\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op);\n  if (request.params.op === 'clear') {\n    consoleContents = [];\n  }\n  response.send(consoleContents);\n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function (req, res, next) {\n  require('./server/server-render')(req.path, function (err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nvar watcher = _chokidar2.default.watch('./server');\n\nwatcher.on('ready', function () {\n  watcher.on('all', function () {\n    console.log(\"Clearing /server/ module cache from server\");\n    (0, _keys2.default)(require.cache).forEach(function (id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function () {\n  console.log(\"Clearing /client/ module cache from server\");\n  (0, _keys2.default)(require.cache).forEach(function (id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nvar server = _http2.default.createServer(app);\nserver.listen(3000, 'localhost', function (err) {\n  if (err) throw err;\n\n  var addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nvar tickNo = 0;\nvar bindConsole = function bindConsole() {\n  var oldLog = console.log.bind(console);\n  oldLog('this');\n\n  var newLog = function newLog() {\n    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {\n      args[_key] = arguments[_key];\n    }\n\n    oldLog.apply(undefined, args);\n    oldLog(\"from newlog\");\n    if (consoleContents.length < 10) consoleContents.push((0, _stringify2.default)(args));\n    //oldLog(consoleContents)\n  };\n\n  newLog('thihs', 'and that');\n  console.log = newLog;\n};\nbindConsole();\nconsole.log(\"After bind\");\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNlcnZlci5qcyJdLCJuYW1lcyI6WyJnZW5lcmF0ZVNjb3BlZE5hbWUiLCJjb21waWxlciIsImFwcCIsInVzZSIsIm5vSW5mbyIsInB1YmxpY1BhdGgiLCJvdXRwdXQiLCJyZXEiLCJyZXMiLCJuZXh0IiwicmVxdWlyZSIsImNvbnNvbGVDb250ZW50cyIsImdldCIsInJlcXVlc3QiLCJyZXNwb25zZSIsImNvbnNvbGUiLCJsb2ciLCJwYXJhbXMiLCJvcCIsInNlbmQiLCJwYXRoIiwiZXJyIiwicGFnZSIsIndhdGNoZXIiLCJ3YXRjaCIsIm9uIiwiY2FjaGUiLCJmb3JFYWNoIiwiaWQiLCJ0ZXN0IiwicGx1Z2luIiwic2VydmVyIiwiY3JlYXRlU2VydmVyIiwibGlzdGVuIiwiYWRkciIsImFkZHJlc3MiLCJwb3J0IiwidGlja05vIiwiYmluZENvbnNvbGUiLCJvbGRMb2ciLCJiaW5kIiwibmV3TG9nIiwiYXJncyIsImxlbmd0aCIsInB1c2giXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFBQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7O0FBQ0E7Ozs7QUFDQTs7OztBQUNBOzs7Ozs7QUFFQSxxQ0FBc0IsRUFBQ0Esb0JBQW9CLHNCQUFyQixFQUF0QjtBQUNBLElBQU1DLFdBQVcseUNBQWpCO0FBQ0EsSUFBTUMsTUFBTSx3QkFBWjs7QUFFQTtBQUNBQSxJQUFJQyxHQUFKLENBQVEsb0NBQXFCRixRQUFyQixFQUErQjtBQUNyQ0csVUFBUSxJQUQ2QixFQUN2QkMsWUFBWSxrQkFBT0MsTUFBUCxDQUFjRDtBQURILENBQS9CLENBQVI7QUFHQUgsSUFBSUMsR0FBSixDQUFRLG9DQUFxQkYsUUFBckIsQ0FBUjs7QUFFQTtBQUNBQyxJQUFJQyxHQUFKLENBQVEsVUFBU0ksR0FBVCxFQUFjQyxHQUFkLEVBQW1CQyxJQUFuQixFQUF5QjtBQUMvQkMsVUFBUSxjQUFSLEVBQXdCSCxHQUF4QixFQUE2QkMsR0FBN0IsRUFBa0NDLElBQWxDO0FBQ0QsQ0FG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dCI6Ii9hcHAiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgY2hva2lkYXIgZnJvbSAnY2hva2lkYXInO1xuaW1wb3J0IGNvbmZpZyBmcm9tICcuL3dlYnBhY2suY29uZmlnJztcbmltcG9ydCBjc3NNb2R1bGVzUmVxdWlyZUhvb2sgZnJvbSAnY3NzLW1vZHVsZXMtcmVxdWlyZS1ob29rJztcbmltcG9ydCBleHByZXNzIGZyb20gJ2V4cHJlc3MnO1xuaW1wb3J0IGh0dHAgZnJvbSAnaHR0cCc7XG5pbXBvcnQgd2VicGFjayBmcm9tICd3ZWJwYWNrJztcbmltcG9ydCB3ZWJwYWNrRGV2TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWRldi1taWRkbGV3YXJlJztcbmltcG9ydCB3ZWJwYWNrSG90TWlkZGxld2FyZSBmcm9tICd3ZWJwYWNrLWhvdC1taWRkbGV3YXJlJztcblxuY3NzTW9kdWxlc1JlcXVpcmVIb29rKHtnZW5lcmF0ZVNjb3BlZE5hbWU6ICdbcGF0aF1bbmFtZV0tW2xvY2FsXSd9KTtcbmNvbnN0IGNvbXBpbGVyID0gd2VicGFjayhjb25maWcpO1xuY29uc3QgYXBwID0gZXhwcmVzcygpO1xuXG4vLyBTZXJ2ZSBob3QtcmVsb2FkaW5nIGJ1bmRsZSB0byBjbGllbnRcbmFwcC51c2Uod2VicGFja0Rldk1pZGRsZXdhcmUoY29tcGlsZXIsIHtcbiAgbm9JbmZvOiB0cnVlLCBwdWJsaWNQYXRoOiBjb25maWcub3V0cHV0LnB1YmxpY1BhdGhcbn0pKTtcbmFwcC51c2Uod2VicGFja0hvdE1pZGRsZXdhcmUoY29tcGlsZXIpKTtcblxuLy8gSW5jbHVkZSBzZXJ2ZXIgcm91dGVzIGFzIGEgbWlkZGxld2FyZVxuYXBwLnVzZShmdW5jdGlvbihyZXEsIHJlcywgbmV4dCkge1xuICByZXF1aXJlKCcuL3NlcnZlci9hcHAnKShyZXEsIHJlcywgbmV4dCk7XG59KTtcbmxldCBjb25zb2xlQ29udGVudHMgPSBbXVxuXG5cblxuYXBwLmdldChcIi9jb25zb2xlLzpvcFwiLCBmdW5jdGlvbiAocmVxdWVzdCwgcmVzcG9uc2UpIHtcbiAgY29uc29sZS5sb2cocmVxdWVzdC5wYXJhbXMub3ApXG4gIGlmKHJlcXVlc3QucGFyYW1zLm9wPT09J2NsZWFyJyl7XG4gICAgY29uc29sZUNvbnRlbnRzID0gW11cbiAgfVxuICByZXNwb25zZS5zZW5kKGNvbnNvbGVDb250ZW50cyk7IFxufSk7XG4vLyBBbnl0aGluZyBlbHNlIGdldHMgcGFzc2VkIHRvIHRoZSBjbGllbnQgYXBwJ3Mgc2VydmVyIHJlbmRlcmluZ1xuYXBwLmdldCgnKicsIGZ1bmN0aW9uKHJlcSwgcmVzLCBuZXh0KSB7XG4gIHJlcXVpcmUoJy4vc2VydmVyL3NlcnZlci1yZW5kZXInKShyZXEucGF0aCwgZnVuY3Rpb24oZXJyLCBwYWdlKSB7XG4gICAgaWYgKGVycikgcmV0dXJuIG5leHQoZXJyKTtcbiAgICByZXMuc2VuZChwYWdlKTtcbiAgfSk7XG59KTtcblxuLy8gRG8gXCJob3QtcmVsb2FkaW5nXCIgb2YgZXhwcmVzcyBzdHVmZiBvbiB0aGUgc2VydmVyXG4vLyBUaHJvdyBhd2F5IGNhY2hlZCBtb2R1bGVzIGFuZCByZS1yZXF1aXJlIG5leHQgdGltZVxuLy8gRW5zdXJlIHRoZXJlJ3Mgbm8gaW1wb3J0YW50IHN0YXRlIGluIHRoZXJlIVxuY29uc3Qgd2F0Y2hlciA9IGNob2tpZGFyLndhdGNoKCcuL3NlcnZlcicpO1xuXG53YXRjaGVyLm9uKCdyZWFkeScsIGZ1bmN0aW9uKCkge1xuICB3YXRjaGVyLm9uKCdhbGwnLCBmdW5jdGlvbigpIHtcbiAgICBjb25zb2xlLmxvZyhcIkNsZWFyaW5nIC9zZXJ2ZXIvIG1vZHVsZSBjYWNoZSBmcm9tIHNlcnZlclwiKTtcbiAgICBPYmplY3Qua2V5cyhyZXF1aXJlLmNhY2hlKS5mb3JFYWNoKGZ1bmN0aW9uKGlkKSB7XG4gICAgICBpZiAoL1tcXC9cXFxcXXNlcnZlcltcXC9cXFxcXS8udGVzdChpZCkpIGRlbGV0ZSByZXF1aXJlLmNhY2hlW2lkXTtcbiAgICB9KTtcbiAgfSk7XG59KTtcblxuLy8gRG8gXCJob3QtcmVsb2FkaW5nXCIgb2YgcmVhY3Qgc3R1ZmYgb24gdGhlIHNlcnZlclxuLy8gVGhyb3cgYXdheSB0aGUgY2FjaGVkIGNsaWVudCBtb2R1bGVzIGFuZCBsZXQgdGhlbSBiZSByZS1yZXF1aXJlZCBuZXh0IHRpbWVcbmNvbXBpbGVyLnBsdWdpbignZG9uZScsIGZ1bmN0aW9uKCkge1xuICBjb25zb2xlLmxvZyhcIkNsZWFyaW5nIC9jbGllbnQvIG1vZHVsZSBjYWNoZSBmcm9tIHNlcnZlclwiKTtcbiAgT2JqZWN0LmtleXMocmVxdWlyZS5jYWNoZSkuZm9yRWFjaChmdW5jdGlvbihpZCkge1xuICAgIGlmICgvW1xcL1xcXFxdY2xpZW50W1xcL1xcXFxdLy50ZXN0KGlkKSkgZGVsZXRlIHJlcXVpcmUuY2FjaGVbaWRdO1xuICB9KTtcbn0pO1xuXG5jb25zdCBzZXJ2ZXIgPSBodHRwLmNyZWF0ZVNlcnZlcihhcHApO1xuc2VydmVyLmxpc3RlbigzMDAwLCAnbG9jYWxob3N0JywgZnVuY3Rpb24oZXJyKSB7XG4gIGlmIChlcnIpIHRocm93IGVycjtcblxuICBjb25zdCBhZGRyID0gc2VydmVyLmFkZHJlc3MoKTtcblxuICBjb25zb2xlLmxvZygnTGlzdGVuaW5nIGF0IGh0dHA6Ly8lczolZCcsIGFkZHIuYWRkcmVzcywgYWRkci5wb3J0KTtcbn0pO1xubGV0IHRpY2tObyA9IDBcbmxldCBiaW5kQ29uc29sZSA9ICgpID0+IHtcbiAgbGV0IG9sZExvZyA9IGNvbnNvbGUubG9nLmJpbmQoY29uc29sZSlcbiAgb2xkTG9nKCd0aGlzJylcblxuICBsZXQgbmV3TG9nID0gKC4uLmFyZ3MpID0+IHtcbiAgICBvbGRMb2coLi4uYXJncyk7XG4gICAgb2xkTG9nKFwiZnJvbSBuZXdsb2dcIilcbiAgICBpZiAoY29uc29sZUNvbnRlbnRzLmxlbmd0aCA8IDEwKVxuICAgICAgY29uc29sZUNvbnRlbnRzLnB1c2goSlNPTi5zdHJpbmdpZnkoYXJncykpXG4gICAgLy9vbGRMb2coY29uc29sZUNvbnRlbnRzKVxuICB9XG5cbiAgbmV3TG9nKCd0aGlocycsJ2FuZCB0aGF0JykgXG4gIGNvbnNvbGUubG9nID0gbmV3TG9nXG59XG5iaW5kQ29uc29sZSgpXG5jb25zb2xlLmxvZyhcIkFmdGVyIGJpbmRcIik7ICAiXX0=",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "server.js"
+      ],
+      "names": [
+        "generateScopedName",
+        "compiler",
+        "app",
+        "use",
+        "noInfo",
+        "publicPath",
+        "output",
+        "req",
+        "res",
+        "next",
+        "require",
+        "consoleContents",
+        "get",
+        "request",
+        "response",
+        "console",
+        "log",
+        "params",
+        "op",
+        "send",
+        "path",
+        "err",
+        "page",
+        "watcher",
+        "watch",
+        "on",
+        "cache",
+        "forEach",
+        "id",
+        "test",
+        "plugin",
+        "server",
+        "createServer",
+        "listen",
+        "addr",
+        "address",
+        "port",
+        "tickNo",
+        "bindConsole",
+        "oldLog",
+        "bind",
+        "newLog",
+        "args",
+        "length",
+        "push"
+      ],
+      "mappings": "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",
+      "file": "server.js",
+      "sourceRoot": "/app",
+      "sourcesContent": [
+        "import chokidar from 'chokidar';\nimport config from './webpack.config';\nimport cssModulesRequireHook from 'css-modules-require-hook';\nimport express from 'express';\nimport http from 'http';\nimport webpack from 'webpack';\nimport webpackDevMiddleware from 'webpack-dev-middleware';\nimport webpackHotMiddleware from 'webpack-hot-middleware';\n\ncssModulesRequireHook({generateScopedName: '[path][name]-[local]'});\nconst compiler = webpack(config);\nconst app = express();\n\n// Serve hot-reloading bundle to client\napp.use(webpackDevMiddleware(compiler, {\n  noInfo: true, publicPath: config.output.publicPath\n}));\napp.use(webpackHotMiddleware(compiler));\n\n// Include server routes as a middleware\napp.use(function(req, res, next) {\n  require('./server/app')(req, res, next);\n});\nlet consoleContents = []\n\n\n\napp.get(\"/console/:op\", function (request, response) {\n  console.log(request.params.op)\n  if(request.params.op==='clear'){\n    consoleContents = []\n  }\n  response.send(consoleContents); \n});\n// Anything else gets passed to the client app's server rendering\napp.get('*', function(req, res, next) {\n  require('./server/server-render')(req.path, function(err, page) {\n    if (err) return next(err);\n    res.send(page);\n  });\n});\n\n// Do \"hot-reloading\" of express stuff on the server\n// Throw away cached modules and re-require next time\n// Ensure there's no important state in there!\nconst watcher = chokidar.watch('./server');\n\nwatcher.on('ready', function() {\n  watcher.on('all', function() {\n    console.log(\"Clearing /server/ module cache from server\");\n    Object.keys(require.cache).forEach(function(id) {\n      if (/[\\/\\\\]server[\\/\\\\]/.test(id)) delete require.cache[id];\n    });\n  });\n});\n\n// Do \"hot-reloading\" of react stuff on the server\n// Throw away the cached client modules and let them be re-required next time\ncompiler.plugin('done', function() {\n  console.log(\"Clearing /client/ module cache from server\");\n  Object.keys(require.cache).forEach(function(id) {\n    if (/[\\/\\\\]client[\\/\\\\]/.test(id)) delete require.cache[id];\n  });\n});\n\nconst server = http.createServer(app);\nserver.listen(3000, 'localhost', function(err) {\n  if (err) throw err;\n\n  const addr = server.address();\n\n  console.log('Listening at http://%s:%d', addr.address, addr.port);\n});\nlet tickNo = 0\nlet bindConsole = () => {\n  let oldLog = console.log.bind(console)\n  oldLog('this')\n\n  let newLog = (...args) => {\n    oldLog(...args);\n    oldLog(\"from newlog\")\n    if (consoleContents.length < 10)\n      consoleContents.push(JSON.stringify(args))\n    //oldLog(consoleContents)\n  }\n\n  newLog('thihs','and that') \n  console.log = newLog\n}\nbindConsole()\nconsole.log(\"After bind\");  "
+      ]
+    },
+    "mtime": 1525290677623
+  },
+  "{\"filename\":\"/app/webpack.config.js\",\"env\":{\"development\":{\"plugins\":[]}},\"retainLines\":false,\"highlightCode\":true,\"suppressDeprecationMessages\":false,\"presets\":[],\"plugins\":[[[],{\"ssr\":true}],[[],null],[[],null],[[],null],[[],null],[[],null],[[],{\"loose\":false,\"spec\":false}],[[],null],[[],null],[[],{\"spec\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"loose\":false}],[[],null],[[],null],[[],null],[[],{\"loose\":false}],[[],null],[[],{\"loose\":false}],[[],null],[[],null],[[],{\"loose\":false}],[[],{\"async\":false,\"asyncGenerators\":false}]],\"ignore\":[],\"code\":true,\"metadata\":true,\"ast\":true,\"comments\":true,\"compact\":\"auto\",\"minified\":false,\"sourceRoot\":\"/app\",\"babelrc\":true,\"sourceType\":\"module\",\"moduleIds\":false,\"passPerPreset\":false,\"parserOpts\":false,\"generatorOpts\":false}:6.26.0": {
+    "metadata": {
+      "usedHelpers": [
+        "interopRequireDefault"
+      ],
+      "marked": [],
+      "modules": {
+        "imports": [
+          {
+            "source": "webpack",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "webpack"
+              }
+            ]
+          },
+          {
+            "source": "path",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "path"
+              }
+            ]
+          },
+          {
+            "source": "querystring",
+            "imported": [
+              "default"
+            ],
+            "specifiers": [
+              {
+                "kind": "named",
+                "imported": "default",
+                "local": "qs"
+              }
+            ]
+          }
+        ],
+        "exports": {
+          "exported": [],
+          "specifiers": []
+        }
+      }
+    },
+    "options": {
+      "filename": "/app/webpack.config.js",
+      "filenameRelative": "/app/webpack.config.js",
+      "env": {},
+      "retainLines": false,
+      "highlightCode": true,
+      "suppressDeprecationMessages": false,
+      "presets": [],
+      "plugins": [
+        [
+          [],
+          {
+            "ssr": true
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false,
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "spec": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          null
+        ],
+        [
+          [],
+          {
+            "loose": false
+          }
+        ],
+        [
+          [],
+          {
+            "async": false,
+            "asyncGenerators": false
+          }
+        ]
+      ],
+      "ignore": [],
+      "code": true,
+      "metadata": true,
+      "ast": false,
+      "comments": true,
+      "compact": "auto",
+      "minified": false,
+      "sourceMaps": "both",
+      "sourceMapTarget": "webpack.config.js",
+      "sourceFileName": "webpack.config.js",
+      "sourceRoot": "/app",
+      "babelrc": false,
+      "sourceType": "module",
+      "moduleRoot": "/app",
+      "moduleIds": false,
+      "passPerPreset": false,
+      "parserOpts": false,
+      "generatorOpts": false,
+      "basename": "webpack.config"
+    },
+    "ignored": false,
+    "code": "'use strict';\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _webpack = require('webpack');\n\nvar _webpack2 = _interopRequireDefault(_webpack);\n\nvar _path = require('path');\n\nvar _path2 = _interopRequireDefault(_path);\n\nvar _querystring = require('querystring');\n\nvar _querystring2 = _interopRequireDefault(_querystring);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nprocess.env.NODE_ENV = process.env.NODE_ENV || \"development\";\n\nexports.default = {\n  devtool: '#eval-source-map',\n  entry: ['webpack-hot-middleware/client', './client/app.js'],\n  output: {\n    path: __dirname,\n    filename: 'bundle.js',\n    publicPath: '/'\n  },\n  plugins: [new _webpack2.default.optimize.OccurenceOrderPlugin(), new _webpack2.default.HotModuleReplacementPlugin(), new _webpack2.default.NoErrorsPlugin()],\n  resolve: {\n    extensions: ['', '.js'],\n    alias: {\n      request: 'browser-request'\n    }\n  },\n  module: {\n    loaders: [\n    // Javascript\n    {\n      test: /\\.js$/,\n      loader: 'babel',\n      include: _path2.default.join(__dirname, 'client'),\n      query: {\n        \"env\": {\n          \"development\": {\n            \"presets\": [\"react-hmre\"],\n            \"plugins\": [[\"react-transform\", {\n              \"transforms\": [{\n                \"transform\": \"react-transform-hmr\",\n                \"imports\": [\"react\"],\n                \"locals\": [\"module\"]\n              }]\n            }]]\n          }\n        }\n      }\n    },\n\n    // CSS\n    {\n      test: /\\.css$/,\n      include: _path2.default.join(__dirname, 'client'),\n      loader: 'style-loader!css-loader?' + _querystring2.default.stringify({\n        modules: true,\n        importLoaders: 1,\n        localIdentName: '[path][name]-[local]'\n      })\n    }]\n  }\n};\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2suY29uZmlnLmpzIl0sIm5hbWVzIjpbInByb2Nlc3MiLCJlbnYiLCJOT0RFX0VOViIsImRldnRvb2wiLCJlbnRyeSIsIm91dHB1dCIsInBhdGgiLCJfX2Rpcm5hbWUiLCJmaWxlbmFtZSIsInB1YmxpY1BhdGgiLCJwbHVnaW5zIiwib3B0aW1pemUiLCJPY2N1cmVuY2VPcmRlclBsdWdpbiIsIkhvdE1vZHVsZVJlcGxhY2VtZW50UGx1Z2luIiwiTm9FcnJvcnNQbHVnaW4iLCJyZXNvbHZlIiwiZXh0ZW5zaW9ucyIsImFsaWFzIiwicmVxdWVzdCIsIm1vZHVsZSIsImxvYWRlcnMiLCJ0ZXN0IiwibG9hZGVyIiwiaW5jbHVkZSIsImpvaW4iLCJxdWVyeSIsInN0cmluZ2lmeSIsIm1vZHVsZXMiLCJpbXBvcnRMb2FkZXJzIiwibG9jYWxJZGVudE5hbWUiXSwibWFwcGluZ3MiOiI7Ozs7OztBQUFBOzs7O0FBQ0E7Ozs7QUFDQTs7Ozs7O0FBRUFBLFFBQVFDLEdBQVIsQ0FBWUMsUUFBWixHQUF1QkYsUUFBUUMsR0FBUixDQUFZQyxRQUFaLElBQXdCLGFBQS9DOztrQkFFZTtBQUNiQyxXQUFTLGtCQURJO0FBRWJDLFNBQU8sQ0FDTCwrQkFESyxFQUVMLGlCQUZLLENBRk07QUFNYkMsVUFBUTtBQUNOQyxVQUFNQyxTQURBO0FBRU5DLGNBQVUsV0FGSjtBQUdOQyxnQkFBWTtBQUhOLEdBTks7QUFXYkMsV0FBUyxDQUNQLElBQUksa0JBQVFDLFFBQVIsQ0FBaUJDLG9CQUFyQixFQURPLEVBRVAsSUFBSSxrQkFBUUMsMEJBQVosRUFGTyxFQUdQLElBQUksa0JBQVFDLGNBQVosRUFITyxDQVhJO0FBZ0JiQyxXQUFTO0FBQ1BDLGdCQUFZLENBQUMsRUFBRCxFQUFLLEtBQUwsQ0FETDtBQUVQQyxXQUFPO0FBQ0xDLGVBQVM7QUFESjtBQUZBLEdBaEJJO0FBc0JiQyxVQUFRO0FBQ05DLGFBQVM7QUFDUDtBQUNBO0FBQ0VDLFlBQU0sT0FEUjtBQUVFQyxjQUFRLE9BRlY7QUFHRUMsZUFBUyxlQUFLQyxJQUFMLENBQVVqQixTQUFWLEVBQXFCLFFBQXJCLENBSFg7QUFJRWtCLGFBQU87QUFDTCxlQUFPO0FBQ0wseUJBQWU7QUFDYix1QkFBVyxDQUFDLFlBQUQsQ0FERTtBQUViLHVCQUFXLENBQ1QsQ0FBQyxpQkFBRCxFQUFvQjtBQUNsQiw0QkFBYyxDQUFDO0FBQ2IsNkJBQWEscUJBREE7QUFFYiwyQkFBVyxDQUFDLE9BQUQsQ0FGRTtBQUdiLDBCQUFVLENBQUMsUUFBRDtBQUhHLGVBQUQ7QUFESSxhQUFwQixDQURTO0FBRkU7QUFEVjtBQURGO0FBSlQsS0FGTzs7QUF3QlA7QUFDQTtBQUNFSixZQUFNLFFBRFI7QUFFRUUsZUFBUyxlQUFLQyxJQUFMLENBQVVqQixTQUFWLEVBQXFCLFFBQXJCLENBRlg7QUFHRWUsY0FBUSw2QkFBNkIsc0JBQUdJLFNBQUgsQ0FBYTtBQUNoREMsaUJBQVMsSUFEdUM7QUFFaERDLHVCQUFlLENBRmlDO0FBR2hEQyx3QkFBZ0I7QUFIZ0MsT0FBYjtBQUh2QyxLQXpCTztBQURIO0FBdEJLLEMiLCJmaWxlIjoid2VicGFjay5jb25maWcuanMiLCJzb3VyY2VSb290IjoiL2FwcCIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB3ZWJwYWNrIGZyb20gJ3dlYnBhY2snO1xuaW1wb3J0IHBhdGggZnJvbSAncGF0aCc7XG5pbXBvcnQgcXMgZnJvbSAncXVlcnlzdHJpbmcnO1xuXG5wcm9jZXNzLmVudi5OT0RFX0VOViA9IHByb2Nlc3MuZW52Lk5PREVfRU5WIHx8IFwiZGV2ZWxvcG1lbnRcIjtcblxuZXhwb3J0IGRlZmF1bHQge1xuICBkZXZ0b29sOiAnI2V2YWwtc291cmNlLW1hcCcsXG4gIGVudHJ5OiBbXG4gICAgJ3dlYnBhY2staG90LW1pZGRsZXdhcmUvY2xpZW50JyxcbiAgICAnLi9jbGllbnQvYXBwLmpzJ1xuICBdLFxuICBvdXRwdXQ6IHtcbiAgICBwYXRoOiBfX2Rpcm5hbWUsXG4gICAgZmlsZW5hbWU6ICdidW5kbGUuanMnLFxuICAgIHB1YmxpY1BhdGg6ICcvJ1xuICB9LFxuICBwbHVnaW5zOiBbXG4gICAgbmV3IHdlYnBhY2sub3B0aW1pemUuT2NjdXJlbmNlT3JkZXJQbHVnaW4oKSxcbiAgICBuZXcgd2VicGFjay5Ib3RNb2R1bGVSZXBsYWNlbWVudFBsdWdpbigpLFxuICAgIG5ldyB3ZWJwYWNrLk5vRXJyb3JzUGx1Z2luKClcbiAgXSxcbiAgcmVzb2x2ZToge1xuICAgIGV4dGVuc2lvbnM6IFsnJywgJy5qcyddLFxuICAgIGFsaWFzOiB7XG4gICAgICByZXF1ZXN0OiAnYnJvd3Nlci1yZXF1ZXN0J1xuICAgIH1cbiAgfSxcbiAgbW9kdWxlOiB7XG4gICAgbG9hZGVyczogW1xuICAgICAgLy8gSmF2YXNjcmlwdFxuICAgICAge1xuICAgICAgICB0ZXN0OiAvXFwuanMkLyxcbiAgICAgICAgbG9hZGVyOiAnYmFiZWwnLFxuICAgICAgICBpbmNsdWRlOiBwYXRoLmpvaW4oX19kaXJuYW1lLCAnY2xpZW50JyksXG4gICAgICAgIHF1ZXJ5OiB7XG4gICAgICAgICAgXCJlbnZcIjoge1xuICAgICAgICAgICAgXCJkZXZlbG9wbWVudFwiOiB7XG4gICAgICAgICAgICAgIFwicHJlc2V0c1wiOiBbXCJyZWFjdC1obXJlXCJdLFxuICAgICAgICAgICAgICBcInBsdWdpbnNcIjogW1xuICAgICAgICAgICAgICAgIFtcInJlYWN0LXRyYW5zZm9ybVwiLCB7XG4gICAgICAgICAgICAgICAgICBcInRyYW5zZm9ybXNcIjogW3tcbiAgICAgICAgICAgICAgICAgICAgXCJ0cmFuc2Zvcm1cIjogXCJyZWFjdC10cmFuc2Zvcm0taG1yXCIsXG4gICAgICAgICAgICAgICAgICAgIFwiaW1wb3J0c1wiOiBbXCJyZWFjdFwiXSxcbiAgICAgICAgICAgICAgICAgICAgXCJsb2NhbHNcIjogW1wibW9kdWxlXCJdXG4gICAgICAgICAgICAgICAgICB9XVxuICAgICAgICAgICAgICAgIH1dXG4gICAgICAgICAgICAgIF1cbiAgICAgICAgICAgIH1cbiAgICAgICAgICB9LFxuICAgICAgICB9XG4gICAgICB9LFxuXG4gICAgICAvLyBDU1NcbiAgICAgIHtcbiAgICAgICAgdGVzdDogL1xcLmNzcyQvLFxuICAgICAgICBpbmNsdWRlOiBwYXRoLmpvaW4oX19kaXJuYW1lLCAnY2xpZW50JyksXG4gICAgICAgIGxvYWRlcjogJ3N0eWxlLWxvYWRlciFjc3MtbG9hZGVyPycgKyBxcy5zdHJpbmdpZnkoe1xuICAgICAgICAgIG1vZHVsZXM6IHRydWUsXG4gICAgICAgICAgaW1wb3J0TG9hZGVyczogMSxcbiAgICAgICAgICBsb2NhbElkZW50TmFtZTogJ1twYXRoXVtuYW1lXS1bbG9jYWxdJ1xuICAgICAgICB9KVxuICAgICAgfVxuXG4gICAgXVxuICB9XG59O1xuIl19",
+    "ast": null,
+    "map": {
+      "version": 3,
+      "sources": [
+        "webpack.config.js"
+      ],
+      "names": [
+        "process",
+        "env",
+        "NODE_ENV",
+        "devtool",
+        "entry",
+        "output",
+        "path",
+        "__dirname",
+        "filename",
+        "publicPath",
+        "plugins",
+        "optimize",
+        "OccurenceOrderPlugin",
+        "HotModuleReplacementPlugin",
+        "NoErrorsPlugin",
+        "resolve",
+        "extensions",
+        "alias",
+        "request",
+        "module",
+        "loaders",
+        "test",
+        "loader",
+        "include",
+        "join",
+        "query",
+        "stringify",
+        "modules",
+        "importLoaders",
+        "localIdentName"
+      ],
+      "mappings": ";;;;;;AAAA;;;;AACA;;;;AACA;;;;;;AAEAA,QAAQC,GAAR,CAAYC,QAAZ,GAAuBF,QAAQC,GAAR,CAAYC,QAAZ,IAAwB,aAA/C;;kBAEe;AACbC,WAAS,kBADI;AAEbC,SAAO,CACL,+BADK,EAEL,iBAFK,CAFM;AAMbC,UAAQ;AACNC,UAAMC,SADA;AAENC,cAAU,WAFJ;AAGNC,gBAAY;AAHN,GANK;AAWbC,WAAS,CACP,IAAI,kBAAQC,QAAR,CAAiBC,oBAArB,EADO,EAEP,IAAI,kBAAQC,0BAAZ,EAFO,EAGP,IAAI,kBAAQC,cAAZ,EAHO,CAXI;AAgBbC,WAAS;AACPC,gBAAY,CAAC,EAAD,EAAK,KAAL,CADL;AAEPC,WAAO;AACLC,eAAS;AADJ;AAFA,GAhBI;AAsBbC,UAAQ;AACNC,aAAS;AACP;AACA;AACEC,YAAM,OADR;AAEEC,cAAQ,OAFV;AAGEC,eAAS,eAAKC,IAAL,CAAUjB,SAAV,EAAqB,QAArB,CAHX;AAIEkB,aAAO;AACL,eAAO;AACL,yBAAe;AACb,uBAAW,CAAC,YAAD,CADE;AAEb,uBAAW,CACT,CAAC,iBAAD,EAAoB;AAClB,4BAAc,CAAC;AACb,6BAAa,qBADA;AAEb,2BAAW,CAAC,OAAD,CAFE;AAGb,0BAAU,CAAC,QAAD;AAHG,eAAD;AADI,aAApB,CADS;AAFE;AADV;AADF;AAJT,KAFO;;AAwBP;AACA;AACEJ,YAAM,QADR;AAEEE,eAAS,eAAKC,IAAL,CAAUjB,SAAV,EAAqB,QAArB,CAFX;AAGEe,cAAQ,6BAA6B,sBAAGI,SAAH,CAAa;AAChDC,iBAAS,IADuC;AAEhDC,uBAAe,CAFiC;AAGhDC,wBAAgB;AAHgC,OAAb;AAHvC,KAzBO;AADH;AAtBK,C",
+      "file": "webpack.config.js",
+      "sourceRoot": "/app",
+      "sourcesContent": [
+        "import webpack from 'webpack';\nimport path from 'path';\nimport qs from 'querystring';\n\nprocess.env.NODE_ENV = process.env.NODE_ENV || \"development\";\n\nexport default {\n  devtool: '#eval-source-map',\n  entry: [\n    'webpack-hot-middleware/client',\n    './client/app.js'\n  ],\n  output: {\n    path: __dirname,\n    filename: 'bundle.js',\n    publicPath: '/'\n  },\n  plugins: [\n    new webpack.optimize.OccurenceOrderPlugin(),\n    new webpack.HotModuleReplacementPlugin(),\n    new webpack.NoErrorsPlugin()\n  ],\n  resolve: {\n    extensions: ['', '.js'],\n    alias: {\n      request: 'browser-request'\n    }\n  },\n  module: {\n    loaders: [\n      // Javascript\n      {\n        test: /\\.js$/,\n        loader: 'babel',\n        include: path.join(__dirname, 'client'),\n        query: {\n          \"env\": {\n            \"development\": {\n              \"presets\": [\"react-hmre\"],\n              \"plugins\": [\n                [\"react-transform\", {\n                  \"transforms\": [{\n                    \"transform\": \"react-transform-hmr\",\n                    \"imports\": [\"react\"],\n                    \"locals\": [\"module\"]\n                  }]\n                }]\n              ]\n            }\n          },\n        }\n      },\n\n      // CSS\n      {\n        test: /\\.css$/,\n        include: path.join(__dirname, 'client'),\n        loader: 'style-loader!css-loader?' + qs.stringify({\n          modules: true,\n          importLoaders: 1,\n          localIdentName: '[path][name]-[local]'\n        })\n      }\n\n    ]\n  }\n};\n"
+      ]
+    },
+    "mtime": 1525290797834
   }
 }
