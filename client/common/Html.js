@@ -5,8 +5,7 @@
  * Note we're returning a template string from this function.
  */
 const Html = ({ body, title,store,styles }) => {
-  console.log("TML")
-  console.log( store, styles)
+
   return `
   <!DOCTYPE html>
   <html>

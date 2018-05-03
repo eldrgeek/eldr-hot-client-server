@@ -80,7 +80,7 @@ let bindConsole = () => {
     oldLog(...args);
     oldLog("from newlog")
     if (consoleContents.length < 10)
-      consoleContents.push(JSON.stringify(args))
+      consoleContents.push(args)
     //oldLog(consoleContents)
   }
 

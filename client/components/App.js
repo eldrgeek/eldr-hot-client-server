@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './App.css';
 import { connect } from 'react-redux';
 import CountButton from './CountButton'
 import Console from './Console'
