@@ -2,7 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 import styles from './App.css';
 import StyledButton from './StyledButton'
-let BlueButton = StyledButton("blue")
+let BlueButton = StyledButton
 const doFetch = (url,setState) => fetch(location.origin + url)
     .then(function(response) {
     return(response.json());

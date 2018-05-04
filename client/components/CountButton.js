@@ -3,7 +3,7 @@ import styles from './App.css';
 import { connect } from 'react-redux';
 import styled from 'styled-components'
 import StyledButton from './StyledButton'
-let RedButton = StyledButton("red")
+let RedButton = StyledButton
 
 
 const CountButton = connect(state => ({count: state}))(React.createClass({
@@ -16,7 +16,7 @@ const CountButton = connect(state => ({count: state}))(React.createClass({
     return (
     <div>
 
-        <RedButton
+        <RedButton primary={true}
           
           onClick={() => dispatch({type: "INC"})}
         >

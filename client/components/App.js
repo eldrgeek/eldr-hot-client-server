@@ -11,7 +11,7 @@ const App = connect(state => ({count: state}))(React.createClass({
     const { count, dispatch } = this.props;
     return (
       <div>
-        <h1>Demonstrator5555</h1>
+        <h1>Demonstrator</h1>
         <CountButton />
         <Console />
         <p>

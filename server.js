@@ -26,7 +26,7 @@ let consoleContents = []
 
 
 app.get("/console/:op", function (request, response) {
-  console.log(request.params.op)
+  console.log( "this", [1,2 , [4,5]])
   if(request.params.op==='clear'){
     consoleContents = []
   }
