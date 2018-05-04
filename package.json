@@ -35,6 +35,10 @@
     "style-loader": "^0.13.1",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1",
-    "webpack-hot-middleware": "^2.12.1"
+    "webpack-hot-middleware": "^2.12.1",
+    "styled-components": "^3.2.6",
+    "babel-plugin-styled-components": "^1.5.1",
+    "glamor": "^2.20.40",
+    "glamorous": "^4.12.5"
   }
 }

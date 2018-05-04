@@ -1,6 +1,10 @@
 import React from 'react';
 import styles from './App.css';
 import { connect } from 'react-redux';
+import styled from 'styled-components'
+import StyledButton from './StyledButton'
+let RedButton = StyledButton
+
 
 const CountButton = connect(state => ({count: state}))(React.createClass({
   propTypes: {
@@ -12,12 +16,12 @@ const CountButton = connect(state => ({count: state}))(React.createClass({
     return (
     <div>
 
-        <button
-          className={styles.increment}
+        <RedButton primary={true}
+          
           onClick={() => dispatch({type: "INC"})}
         >
   {count.num}
-        </button>
+        </RedButton>
   </div>
   )
   }

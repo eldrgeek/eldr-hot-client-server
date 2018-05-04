@@ -15,8 +15,9 @@
       "\\.json",
       "webpack.config.js",
       "server.js",
-      ".eslintrc"
+      ".eslintrc",
+      ".babelrc"
     ]
   },
-  "throttle": 100
+  "throttle": 500
 }
