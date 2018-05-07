@@ -1,5 +1,6 @@
 import { createStore } from 'redux';
 
+
 const configureStore = (initialState) => {
   const store = createStore(require('./reducers'), initialState);
 

@@ -1,19 +1,25 @@
-const initial = {
-  num: 5,
-};
-const handlers = {
-  INC(s) {
-    return {
-      num: s.num + 1
-    };
-  }
-};
-function reducer(state = initial, action) {
-  if (handlers[action.type]) {
-    return handlers[action.type](state);
-  }
+import { combineReducers } from 'redux'
 
-  return state;
+    
+let num = (state = 5, action) => {
+  switch (action.type) {
+    case 'INC':
+      return state + 1
+    case 'DEC':
+      return state - 1
+    default:
+      return state
+  }
 }
 
-module.exports = reducer;
+let consoleContents = (state = [], action) => {
+  switch (action.type) {
+  case 'SET_CONTENTS':
+    return action.contents;
+    default:
+      return state
+  }
+};
+
+
+module.exports = combineReducers({num,consoleContents})

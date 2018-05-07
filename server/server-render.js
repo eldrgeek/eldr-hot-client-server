@@ -1,5 +1,5 @@
 import App from '../client/components/App';
-import GlamorHtml from '../client/common/GlamorHtml';
+import Html from '../client/common/Html';
 import configureStore from '../client/store';
 
 import React from 'react';
@@ -12,13 +12,14 @@ import ReactDOMServer from 'react-dom/server'
 
 
 
-console.log("New Server-Renders") 
 // eslint-disable-next-line no-sync
 
-function renderApp(path, callback) {
+function renderApp(consoleContents, path, callback) {
   
-  const store = configureStore();
+//  const store = configureStore({consoleContents});
+  const store = configureStore({consoleContents});
   const state = store.getState();
+  
   
   let {html, css, ids} = renderStatic(() => ReactDOMServer.renderToString(
     <Provider store={store}>
@@ -26,7 +27,7 @@ function renderApp(path, callback) {
       </Provider>))
 
    
-  let page1 = GlamorHtml({html, title: "The really good title", store: JSON.stringify(state), css, ids})
+  let page1 = Html({html, title: "The really good title", store: JSON.stringify(state), css, ids})
   //console.log(page1)
   callback(null, page1);
 }
