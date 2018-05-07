@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import StyledButton from './StyledButton'
 let RedButton = StyledButton
 
-
 const CountButton = connect(state => ({count: state}))(React.createClass({
   propTypes: {
     count: React.PropTypes.object.isRequired,

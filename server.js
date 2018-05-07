@@ -24,9 +24,8 @@ app.use(function(req, res, next) {
 let consoleContents = []
 
 
-
 app.get("/console/:op", function (request, response) {
-  console.log( "this", [1,2 , [4,5]])
+  console.log( [1,2 , [4,5]])
   if(request.params.op==='clear'){
     consoleContents = []
   }
@@ -34,7 +33,7 @@ app.get("/console/:op", function (request, response) {
 });
 // Anything else gets passed to the client app's server rendering
 app.get('*', function(req, res, next) {
-  require('./server/server-render')(req.path, function(err, page) {
+  require('./server/server-render')(consoleContents,req.path, function(err, page) {
     if (err) return next(err);
     res.send(page);
   });
@@ -44,6 +43,10 @@ app.get('*', function(req, res, next) {
 // Throw away cached modules and re-require next time
 // Ensure there's no important state in there!
 const watcher = chokidar.watch('./server');
+
+const clearServerCache = () => {
+  
+}
 
 watcher.on('ready', function() {
   watcher.on('all', function() {
@@ -59,7 +62,11 @@ watcher.on('ready', function() {
 compiler.plugin('done', function() {
   console.log("Clearing /client/ module cache from server");
   Object.keys(require.cache).forEach(function(id) {
-    if (/[\/\\]client[\/\\]/.test(id)) delete require.cache[id];
+    if (/[\/\\]client[\/\\]/.test(id) ) console.log.log(id);
+    if (/[\/\\]client[\/\\]/.test(id) || /[\/\\]server[\/\\]server/.test(id)) {
+      console.log(`deleting ${id}`)
+      delete require.cache[id];
+    }
   });
 });
 
@@ -86,6 +93,7 @@ let bindConsole = () => {
 
   newLog('thihs','and that') 
   console.log = newLog
+  console.log.log = oldLog
 }
 bindConsole()
 console.log("After bind");  
