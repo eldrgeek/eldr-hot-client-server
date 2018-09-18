@@ -10,7 +10,8 @@ import {connect} from 'react-redux'
 class ConsoleLine extends React.Component {
   constructor(props) {
     super(props);
-     }
+  }
+  
    render() {
      let key = this.props.level + "." + this.props.index
      
@@ -46,6 +47,7 @@ class Console extends React.Component {
   }
   
   doFetch(url){
+    console.log("Console.doFetch() url=", url)
     this.counter = 0
     let setContents = this.props.setContents.bind(this)
     fetch(location.origin + url)
@@ -61,11 +63,11 @@ class Console extends React.Component {
   fetch() {
     this.doFetch('/console/list')
   }
+        
   clear() {
-  
     this.doFetch('/console/clear')
-    
   }
+        
   render(){
     
     let contents = this.props.consoleContents
